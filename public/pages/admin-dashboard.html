@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://code.jquery.com; connect-src 'self';">
+    <link rel="stylesheet" href="/css/styles.css">
+    
+    <script src="https://cdn.tailwindcss.com" defer></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" defer></script>
+    
+    <script src="/js/utils.js" defer></script>
+    <script src="/js/services.js" defer></script>
+    <script src="/js/role.js" defer></script>
+    <script src="/js/admin.js" defer></script>
+    <script src="/js/app.js" defer></script>
+</head>
+<body class="min-h-screen font-sans bg-pastel p-4 sm:p-8">
+    <nav class="glass-pwa rounded-xl px-6 py-4 flex justify-between items-center mb-8 max-w-5xl mx-auto shadow-sm">
+        <div>
+            <h1 class="text-xl font-bold tracking-tight text-gray-800">Admin Console</h1>
+            <p class="text-xs text-gray-500 font-medium tracking-wide">LIGHTWEIGHT READ-ONLY OVERVIEW</p>
+        </div>
+        <button id="logout-btn" class="text-sm font-medium text-gray-600 hover:text-red-500 transition-colors" aria-label="Logout Admin">Terminate Session</button>
+    </nav>
+
+    <main class="max-w-5xl mx-auto space-y-6">
+        
+        <!-- High Level Status Cards -->
+        <section class="grid grid-cols-1 md:grid-cols-2 gap-6" aria-label="Core Metrics">
+             <div class="glass-pwa rounded-2xl p-6 text-center shadow-md">
+                 <h2 class="text-sm uppercase text-gray-500 font-bold tracking-widest mb-2">Total Participants</h2>
+                 <p id="stat-users" class="text-5xl font-black text-gray-800">...</p>
+             </div>
+             
+             <div class="glass-pwa rounded-2xl p-6 text-center shadow-md">
+                 <h2 class="text-sm uppercase text-gray-500 font-bold tracking-widest mb-2">AI Interactions Captured</h2>
+                 <p id="stat-interactions" class="text-5xl font-black text-blue-600">...</p>
+             </div>
+        </section>
+
+        <!-- Recent Activity Feed -->
+        <section class="glass-pwa rounded-2xl p-6 shadow-sm" aria-label="Recent Audit Feed">
+            <h2 class="text-lg font-bold text-gray-900 border-b border-gray-300 pb-3 mb-4">Recent Activity (Global)</h2>
+            <div id="admin-feed-container" class="space-y-4" aria-live="polite">
+                <!-- Injected via admin.js -->
+            </div>
+        </section>
+
+    </main>
+</body>
+</html>

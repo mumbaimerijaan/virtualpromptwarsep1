@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Event Companion</title>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://code.jquery.com https://www.gstatic.com https://apis.google.com; frame-src 'self' https://smarteventconcierge.firebaseapp.com; connect-src 'self' https://firestore.googleapis.com https://generativelanguage.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://www.gstatic.com https://www.googleapis.com https://apis.google.com; img-src 'self' data:;">
+    <link rel="icon" href="data:,">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="stylesheet" href="/css/styles.css">
+    
+    <script src="https://cdn.tailwindcss.com" defer></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" crossorigin="anonymous" defer></script>
+    
+    <!-- Firebase Compat Modules -->
+    <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-app-compat.js" defer></script>
+    <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-auth-compat.js" defer></script>
+
+    <!-- Frontend logic loaders -->
+    <script src="/js/utils.js" defer></script>
+    <script src="/js/services.js" defer></script>
+    <script src="/js/role.js" defer></script>
+    <script src="/js/auth.js" defer></script>
+    <script src="/js/app.js" defer></script>
+</head>
+<body class="min-h-screen font-sans bg-pastel flex items-center justify-center p-4">
+    <!-- Login Card -->
+    <main class="glass-pwa w-full max-w-md p-8 rounded-xl shadow-2xl text-center space-y-6">
+        <h1 class="text-3xl font-bold text-gray-900 tracking-tight">Smart Event Concierge</h1>
+        
+        <div class="space-y-4">
+           <!-- Standard User -->
+           <button id="user-login-btn" class="w-full bg-white hover:bg-gray-50 text-gray-700 font-medium py-3 px-4 rounded-lg transition-all focus:ring-4 focus:ring-gray-200 border border-gray-300 shadow-sm flex items-center justify-center gap-3" aria-label="Login with Google">
+               <!-- Google SVG Logo -->
+               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="20px" height="20px">
+                   <path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8c-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4C12.955 4 4 12.955 4 24s8.955 20 20 20s20-8.955 20-20C44 22.659 43.862 21.35 43.611 20.083z"/>
+                   <path fill="#FF3D00" d="M6.306 14.691l6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4C16.318 4 9.656 8.337 6.306 14.691z"/>
+                   <path fill="#4CAF50" d="M24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238C29.211 35.091 26.715 36 24 36c-5.202 0-9.619-3.317-11.283-7.946l-6.522 5.025C9.505 39.556 16.227 44 24 44z"/>
+                   <path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303c-.792 2.237-2.231 4.166-4.087 5.571c.001-.001.002-.001.003-.002l6.19 5.238C36.971 39.205 44 34 44 24C44 22.659 43.862 21.35 43.611 20.083z"/>
+               </svg>
+               Login with Google
+           </button>
+
+           <div id="admin-divider" class="relative py-2 hidden">
+               <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-gray-300/50"></div></div>
+               <div class="relative flex justify-center"><span class="bg-transparent px-2 text-sm text-gray-600 glass-text">ADMIN</span></div>
+           </div>
+
+           <!-- Admin -->
+           <form id="admin-login-form" class="space-y-3 hidden">
+               <input type="text" id="admin-user" class="w-full px-4 py-2 bg-white/50 border border-white/20 rounded-lg focus:ring-2 focus:ring-purple-400 focus:outline-none" placeholder="Admin Username" required aria-label="Admin Username">
+               <input type="password" id="admin-pass" class="w-full px-4 py-2 bg-white/50 border border-white/20 rounded-lg focus:ring-2 focus:ring-purple-400 focus:outline-none" placeholder="Password" required aria-label="Admin Password">
+               <button type="submit" id="admin-login-btn" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-medium py-3 px-4 rounded-lg transition-all focus:ring-4 focus:ring-purple-300" aria-label="Login as Admin">
+                   Admin Login
+               </button>
+           </form>
+           
+           <p id="login-error" class="text-red-500 text-sm hidden font-medium" aria-live="polite"></p>
+
+           <div class="pt-4">
+               <button id="toggle-admin-btn" class="text-sm font-medium text-gray-500 hover:text-gray-800 hover:underline transition-colors focus:outline-none">Login as admin</button>
+           </div>
+        </div>
+    </main>
+</body>
+</html>

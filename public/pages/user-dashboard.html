@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Event Companion</title>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://code.jquery.com; connect-src 'self'; img-src 'self' data: https://api.qrserver.com;">
+    <link rel="stylesheet" href="/css/styles.css">
+    
+    <script src="https://cdn.tailwindcss.com" defer></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" defer></script>
+    
+    <script src="/js/utils.js" defer></script>
+    <script src="/js/services.js" defer></script>
+    <script src="/js/role.js" defer></script>
+    <script src="/js/qr.js" defer></script>
+    <script src="/js/interactions.js" defer></script>
+    <script src="/js/app.js" defer></script>
+</head>
+<body class="min-h-screen font-sans bg-pastel p-4 sm:p-8 overflow-x-hidden pb-10">
+    
+    <!-- Top Nav (External to Canvas) -->
+    <nav class="max-w-5xl mx-auto flex justify-between items-center mb-6 px-4">
+        <h1 class="text-2xl font-bold tracking-tight text-[#2d3748]">Smart Event Companion</h1>
+        <div class="flex items-center gap-3 bg-white/30 backdrop-blur-md px-4 py-1.5 rounded-full border border-white/40 shadow-sm">
+            <button id="logout-btn" class="text-sm font-semibold text-gray-700 hover:text-gray-900 transition-colors">Log Out</button>
+            <div id="nav-avatar-img" class="w-8 h-8 rounded-full border-2 border-white flex items-center justify-center bg-blue-100 text-blue-700 font-bold text-xs overflow-hidden">
+                <!-- User Initials or Image -->
+            </div>
+        </div>
+    </nav>
+
+    <!-- Master Unified Canvas -->
+    <main class="max-w-5xl mx-auto glass-pwa rounded-[2.5rem] p-8 md:p-12 shadow-2xl relative">
+        
+        <!-- Welcome Block -->
+        <header class="mb-10">
+            <h2 id="welcome-heading" class="text-3xl font-bold text-gray-800 tracking-tight">Welcome, John Doe!</h2>
+            <p class="text-md text-gray-600 mt-2 font-medium">Scan your QR code to connect with others at the event.</p>
+        </header>
+
+        <!-- Profile & Action Bar Section -->
+        <section class="mb-12">
+            <div class="flex flex-col md:flex-row gap-8 items-center bg-white/20 rounded-[2rem] p-6 border border-white/30">
+                <div class="bg-white p-4 rounded-3xl shadow-sm border border-gray-100 shrink-0">
+                    <img id="user-qr-code" src="data:," alt="QR Code" class="w-32 h-32 object-contain" />
+                </div>
+                <div class="flex-1 text-center md:text-left">
+                    <h3 id="dash-name" class="text-2xl font-bold text-gray-900">John Doe</h3>
+                    <p id="dash-company" class="text-gray-600 font-medium">Acme Corp</p>
+                    <p id="dash-role" class="text-gray-500 font-medium text-sm mt-0.5">Software Engineer</p>
+                    <span class="inline-flex items-center gap-2 mt-4 px-4 py-1.5 text-xs font-bold text-purple-700 bg-white/40 border border-white/50 rounded-full shadow-sm">
+                        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path></svg>
+                        Familiar
+                    </span>
+                </div>
+            </div>
+
+            <!-- Horizontal Action Bar -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-8">
+                <button class="glass-btn py-4 rounded-2xl flex items-center justify-center gap-3 text-gray-700 font-bold text-sm shadow-sm opacity-60 cursor-not-allowed">
+                    <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                    Add Contacts
+                </button>
+                <button onclick="$('#interaction-modal').removeClass('hidden')" class="bg-indigo-600/10 border border-indigo-400/40 hover:bg-indigo-600/20 py-4 rounded-2xl flex items-center justify-center gap-3 text-indigo-900 font-bold text-sm shadow-sm transition-all scale-105">
+                    <svg class="w-5 h-5 text-indigo-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                    Log Interaction
+                </button>
+                <button class="glass-btn py-4 rounded-2xl flex items-center justify-center gap-3 text-gray-700 font-bold text-sm shadow-sm opacity-60 cursor-not-allowed">
+                    <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
+                    Generate Insights
+                </button>
+            </div>
+        </section>
+
+        <!-- Dynamic Feed & Insights Split -->
+        <section class="grid grid-cols-1 lg:grid-cols-2 gap-10 mb-12">
+            
+            <!-- Left Pane: Interactions -->
+            <div>
+                <div class="flex justify-between items-center mb-6">
+                    <h4 class="text-xl font-bold text-gray-800">My Interactions</h4>
+                    <span id="total-interactions-time" class="text-xs font-bold text-gray-500 uppercase tracking-widest">0m ago</span>
+                </div>
+                <p id="total-interactions-stat" class="text-sm font-semibold text-gray-600 mb-4 px-1">Total Interactions: 0</p>
+                <div id="interactions-feed" class="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+                     <!-- Card Injection Start -->
+                     <div class="glass-btn p-5 rounded-2xl border border-white/50 flex items-center gap-4 animate-pulse">
+                         <div class="w-12 h-12 rounded-full bg-gray-200 shrink-0"></div>
+                         <div class="flex-1">
+                             <div class="h-4 bg-gray-200 rounded w-1/3 mb-2"></div>
+                             <div class="h-3 bg-gray-200 rounded w-2/3"></div>
+                         </div>
+                     </div>
+                     <!-- End Injection -->
+                </div>
+                <button class="w-full mt-6 py-2.5 glass-btn rounded-xl text-xs font-bold text-gray-600 hover:text-gray-900">View All</button>
+            </div>
+
+            <!-- Right Pane: Insights Checklist -->
+            <div id="insights-pane" class="opacity-40 pointer-events-none transition-all duration-500">
+                <div class="flex justify-between items-center mb-6">
+                    <h4 class="text-xl font-bold text-gray-800">Insights & Actions</h4>
+                    <span id="gen-time" class="text-xs font-bold text-gray-500 uppercase flex items-center gap-1.5 align-middle">
+                        <span class="w-2 h-2 rounded-full bg-purple-400 animate-pulse"></span>
+                        No insights yet
+                    </span>
+                </div>
+                
+                <div class="bg-white/30 border border-white/40 rounded-[2rem] p-8 space-y-8 shadow-sm">
+                    <div>
+                        <h5 class="text-sm font-bold text-indigo-900 mb-4 flex items-center gap-2">
+                             <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M11 3a1 1 0 10-2 0v1a1 1 0 102 0V3zM15.657 5.757a1 1 0 00-1.414-1.414l-.707.707a1 1 0 001.414 1.414l.707-.707zM18 10a1 1 0 01-1 1h-1a1 1 0 110-2h1a1 1 0 011 1zM5.05 6.464A1 1 0 106.464 5.05l-.707-.707a1 1 0 00-1.414 1.414l.707.707zM5 10a1 1 0 01-1 1H3a1 1 0 110-2h1a1 1 0 011 1zM8 16v-1a1 1 0 112 0v1a1 1 0 11-2 0zM13.657 15.657a1 1 0 001.414-1.414l-.707-.707a1 1 0 10-1.414 1.414l.707.707zM16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"></path></svg>
+                             Key Takeaways
+                        </h5>
+                        <ul id="takeaways-list" class="space-y-3 pl-2">
+                            <li class="flex gap-3 text-sm text-gray-700 font-medium italic opacity-50"><span class="text-indigo-500">•</span> Capture interaction to see takeaways...</li>
+                        </ul>
+                    </div>
+                    
+                    <div>
+                        <h5 class="text-sm font-bold text-indigo-900 mb-4 flex items-center gap-2">
+                             <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"></path><path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"></path></svg>
+                             Action Items
+                        </h5>
+                        <div id="actions-checklist" class="space-y-3">
+                             <div class="flex items-start gap-4 text-sm text-gray-500 italic opacity-50">Pending generation...</div>
+                        </div>
+                    </div>
+
+                    <button class="w-full mt-4 py-3 glass-btn rounded-xl text-sm font-bold text-indigo-800 flex items-center justify-center gap-2">
+                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                         Regenerate Insights
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Dynamic Leaderboard Footer -->
+        <section class="mt-20 border-t border-white/30 pt-12 overflow-hidden">
+            <div class="text-center mb-10">
+                <h4 class="text-2xl font-bold text-gray-800">Top Networkers</h4>
+                <p class="text-sm font-medium text-gray-500 mt-1">Top 3 attendees by number of connections.</p>
+            </div>
+            
+            <div id="leaderboard-container" class="grid grid-cols-1 md:grid-cols-2 gap-10">
+                 <!-- Rank 1 & 2 -->
+                 <div class="space-y-4" id="board-col-1">
+                      <!-- Slots (to be filled by JS) -->
+                      <div class="animate-pulse bg-white/20 h-20 rounded-2xl w-full border border-white/30"></div>
+                      <div class="animate-pulse bg-white/20 h-20 rounded-2xl w-full border border-white/30"></div>
+                 </div>
+                 <!-- Rank 3 + View All -->
+                 <div class="space-y-4 flex flex-col justify-between" id="board-col-2">
+                      <div class="animate-pulse bg-white/20 h-20 rounded-2xl w-full border border-white/30"></div>
+                      <button class="w-full py-4 glass-btn rounded-2xl flex items-center justify-center gap-2 text-sm font-bold text-gray-700 mt-auto">
+                           View Full Leaderboard
+                           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                      </button>
+                 </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Hidden Interaction Details Modal (Scoped UI Overlay) -->
+    <div id="interaction-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-md">
+        <section class="glass-pwa rounded-[2rem] p-8 w-full max-w-xl border border-white/50 shadow-2xl relative">
+            <button onclick="$('#interaction-modal').addClass('hidden')" class="absolute top-6 right-6 text-gray-400 hover:text-gray-800 transition">
+                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+            <h2 class="text-2xl font-bold text-gray-900 mb-8 tracking-tight">Log Interaction</h2>
+            
+            <div class="space-y-6">
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">Scanned Identity</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="qr-contact" disabled class="flex-1 bg-white/60 px-5 py-4 rounded-xl border border-white/50 text-sm font-medium" placeholder="Hold QR code to scan...">
+                        <button id="simulate-qr-btn" class="glass-btn px-6 py-4 rounded-xl text-sm font-bold text-indigo-900 transition whitespace-nowrap">Scan</button>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">Interaction Notes</label>
+                    <textarea id="interaction-note" rows="5" class="w-full bg-white/80 px-5 py-5 border border-white/60 rounded-2xl focus:ring-4 focus:ring-indigo-100 focus:outline-none transition resize-none font-medium text-gray-800 placeholder-gray-400" placeholder="Discussed product roadmaps, potential collaboration on AI/ML..."></textarea>
+                </div>
+            </div>
+            
+            <button id="submit-interaction-btn" class="w-full mt-10 py-5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-2xl transition-all font-bold shadow-xl shadow-indigo-500/30 text-lg flex items-center justify-center gap-3">
+                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                 Analyze & Secure
+            </button>
+            
+            <div id="ai-loading" class="hidden mt-6 text-center py-4 bg-indigo-50/60 rounded-xl border border-indigo-200">
+                <span class="inline-block animate-spin h-6 w-6 border-4 border-indigo-600 border-t-transparent rounded-full align-middle mr-3"></span>
+                <span class="text-indigo-900 font-bold text-sm tracking-wide">GEMINI 1.5 FLASH: ORCHESTRATING PAYLOAD...</span>
+            </div>
+        </section>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,36 @@
+/* Advanced Cosmic Glassmorphism configuration */
+body.bg-pastel {
+    background: radial-gradient(circle at 10% 20%, rgba(206, 212, 255, 0.9) 0%, rgba(247, 219, 240, 0.8) 40%, rgba(220, 204, 255, 0.9) 100%),
+                linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%);
+    background-attachment: fixed;
+    background-size: cover;
+}
+
+/* Base Glass Class */
+.glass-pwa {
+    background: rgba(255, 255, 255, 0.35);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+}
+
+/* Interactive Glass Elements */
+.glass-btn {
+    background: rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    box-shadow: 0 4px 15px 0 rgba(31, 38, 135, 0.05);
+    transition: all 0.3s ease;
+}
+
+.glass-btn:hover {
+    background: rgba(255, 255, 255, 0.7);
+    transform: translateY(-1px);
+}
+
+.glass-text {
+    background: rgba(255,255,255,0.7);
+    border-radius: 4px;
+}
