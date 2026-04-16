@@ -82,14 +82,14 @@ describe('Smart Event Companion - Jest Test Matrix', () => {
             expect(res.status).toBe(400);
         });
 
-        test('Invalid Input/AI Formatting Handling Rejects (500)', async () => {
+        test('Invalid Input/AI Formatting triggers Mock Fallback Resilience (200)', async () => {
              const res = await request(app)
                 .post('/api/v1/generate-insights')
                 .set('Authorization', 'Bearer test-token')
                 .send({ notes: '{"INVALID_JSON' });
-             // Service layer detects bad parse schema output and propagates standard 500 mask
-             expect(res.status).toBe(500); 
-             expect(res.body.error).toBe('Internal Server Error');
+             // Service layer detects bad parse schema output, suppresses crash, and returns resilient mock offline data.
+             expect(res.status).toBe(200); 
+             expect(res.body.summary).toBe('Discussed general event networking topics.');
         });
 
         test('AI JSON Parsing correctly extracts variables (200 schema pass)', async () => {

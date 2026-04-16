@@ -1,8 +1,11 @@
 'use strict';
 
-window.utils = {
+const namespace = typeof window !== 'undefined' ? window : global;
+
+namespace.utils = {
     /**
      * Regex based sanitization enforcing zero-trust HTML element erasures.
+     * @description Deflects XSS and malicious script injections by stripping script tags and inline handlers.
      * @param {string} input - Raw string
      * @returns {string} Safe string mapping
      */
@@ -14,12 +17,14 @@ window.utils = {
     },
 
     /**
-     * Formats ID markers dynamically.
+     * Generates a unique 9-character alphanumeric identifier.
+     * @description Creates a random string suitable for DOM IDs or mock interaction tracking.
+     * @returns {string} A randomly generated UID.
      */
     uidGenerator: () => Math.random().toString(36).substr(2, 9)
 };
 
 // Export fallback for jest usage locally
 if (typeof module !== 'undefined') {
-    module.exports = window.utils;
+    module.exports = namespace.utils;
 }

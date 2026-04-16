@@ -22,8 +22,8 @@
     <!-- Top Nav (External to Canvas) -->
     <nav class="max-w-5xl mx-auto flex justify-between items-center mb-6 px-4">
         <h1 class="text-2xl font-bold tracking-tight text-[#2d3748]">Smart Event Companion</h1>
-        <div class="flex items-center gap-3 bg-white/30 backdrop-blur-md px-4 py-1.5 rounded-full border border-white/40 shadow-sm">
-            <button id="logout-btn" class="text-sm font-semibold text-gray-700 hover:text-gray-900 transition-colors">Log Out</button>
+        <div class="flex items-center gap-3 bg-white/30 backdrop-blur-md px-4 py-1.5 rounded-full border border-white/40 shadow-sm" role="navigation">
+            <button id="logout-btn" aria-label="Log Out" class="text-sm font-semibold text-gray-700 hover:text-gray-900 transition-colors">Log Out</button>
             <div id="nav-avatar-img" class="w-8 h-8 rounded-full border-2 border-white flex items-center justify-center bg-blue-100 text-blue-700 font-bold text-xs overflow-hidden">
                 <!-- User Initials or Image -->
             </div>
@@ -58,15 +58,15 @@
 
             <!-- Horizontal Action Bar -->
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-8">
-                <button class="glass-btn py-4 rounded-2xl flex items-center justify-center gap-3 text-gray-700 font-bold text-sm shadow-sm opacity-60 cursor-not-allowed">
+                <button aria-label="Add Contacts" class="glass-btn py-4 rounded-2xl flex items-center justify-center gap-3 text-gray-700 font-bold text-sm shadow-sm opacity-60 cursor-not-allowed">
                     <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                     Add Contacts
                 </button>
-                <button onclick="$('#interaction-modal').removeClass('hidden')" class="bg-indigo-600/10 border border-indigo-400/40 hover:bg-indigo-600/20 py-4 rounded-2xl flex items-center justify-center gap-3 text-indigo-900 font-bold text-sm shadow-sm transition-all scale-105">
+                <button onclick="$('#interaction-modal').removeClass('hidden')" aria-label="Log Interaction" class="bg-indigo-600/10 border border-indigo-400/40 hover:bg-indigo-600/20 py-4 rounded-2xl flex items-center justify-center gap-3 text-indigo-900 font-bold text-sm shadow-sm transition-all scale-105">
                     <svg class="w-5 h-5 text-indigo-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
                     Log Interaction
                 </button>
-                <button class="glass-btn py-4 rounded-2xl flex items-center justify-center gap-3 text-gray-700 font-bold text-sm shadow-sm opacity-60 cursor-not-allowed">
+                <button aria-label="Generate Insights" class="glass-btn py-4 rounded-2xl flex items-center justify-center gap-3 text-gray-700 font-bold text-sm shadow-sm opacity-60 cursor-not-allowed">
                     <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
                     Generate Insights
                 </button>
@@ -94,11 +94,11 @@
                      </div>
                      <!-- End Injection -->
                 </div>
-                <button class="w-full mt-6 py-2.5 glass-btn rounded-xl text-xs font-bold text-gray-600 hover:text-gray-900">View All</button>
+                <button aria-label="View all interactions" class="w-full mt-6 py-2.5 glass-btn rounded-xl text-xs font-bold text-gray-600 hover:text-gray-900">View All</button>
             </div>
 
             <!-- Right Pane: Insights Checklist -->
-            <div id="insights-pane" class="opacity-40 pointer-events-none transition-all duration-500">
+            <div id="insights-pane" aria-live="polite" aria-atomic="true" class="opacity-40 pointer-events-none transition-all duration-500">
                 <div class="flex justify-between items-center mb-6">
                     <h4 class="text-xl font-bold text-gray-800">Insights & Actions</h4>
                     <span id="gen-time" class="text-xs font-bold text-gray-500 uppercase flex items-center gap-1.5 align-middle">
@@ -128,7 +128,7 @@
                         </div>
                     </div>
 
-                    <button class="w-full mt-4 py-3 glass-btn rounded-xl text-sm font-bold text-indigo-800 flex items-center justify-center gap-2">
+                    <button aria-label="Regenerate AI Insights" class="w-full mt-4 py-3 glass-btn rounded-xl text-sm font-bold text-indigo-800 flex items-center justify-center gap-2">
                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
                          Regenerate Insights
                     </button>
@@ -153,7 +153,7 @@
                  <!-- Rank 3 + View All -->
                  <div class="space-y-4 flex flex-col justify-between" id="board-col-2">
                       <div class="animate-pulse bg-white/20 h-20 rounded-2xl w-full border border-white/30"></div>
-                      <button class="w-full py-4 glass-btn rounded-2xl flex items-center justify-center gap-2 text-sm font-bold text-gray-700 mt-auto">
+                      <button aria-label="View Full Leaderboard" class="w-full py-4 glass-btn rounded-2xl flex items-center justify-center gap-2 text-sm font-bold text-gray-700 mt-auto">
                            View Full Leaderboard
                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
                       </button>
@@ -166,7 +166,7 @@
     <!-- Hidden Interaction Details Modal (Scoped UI Overlay) -->
     <div id="interaction-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-md">
         <section class="glass-pwa rounded-[2rem] p-8 w-full max-w-xl border border-white/50 shadow-2xl relative">
-            <button onclick="$('#interaction-modal').addClass('hidden')" class="absolute top-6 right-6 text-gray-400 hover:text-gray-800 transition">
+            <button onclick="$('#interaction-modal').addClass('hidden')" aria-label="Close Modal" class="absolute top-6 right-6 text-gray-400 hover:text-gray-800 transition">
                 <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>
             <h2 class="text-2xl font-bold text-gray-900 mb-8 tracking-tight">Log Interaction</h2>
@@ -176,7 +176,7 @@
                     <label class="block text-sm font-bold text-gray-700 mb-2">Scanned Identity</label>
                     <div class="flex gap-2">
                         <input type="text" id="qr-contact" disabled class="flex-1 bg-white/60 px-5 py-4 rounded-xl border border-white/50 text-sm font-medium" placeholder="Hold QR code to scan...">
-                        <button id="simulate-qr-btn" class="glass-btn px-6 py-4 rounded-xl text-sm font-bold text-indigo-900 transition whitespace-nowrap">Scan</button>
+                        <button id="simulate-qr-btn" aria-label="Simulate QR Scan" class="glass-btn px-6 py-4 rounded-xl text-sm font-bold text-indigo-900 transition whitespace-nowrap">Scan</button>
                     </div>
                 </div>
 
@@ -186,7 +186,7 @@
                 </div>
             </div>
             
-            <button id="submit-interaction-btn" class="w-full mt-10 py-5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-2xl transition-all font-bold shadow-xl shadow-indigo-500/30 text-lg flex items-center justify-center gap-3">
+            <button id="submit-interaction-btn" aria-label="Analyze Interaction and Secure Data" class="w-full mt-10 py-5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-2xl transition-all font-bold shadow-xl shadow-indigo-500/30 text-lg flex items-center justify-center gap-3">
                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
                  Analyze & Secure
             </button>

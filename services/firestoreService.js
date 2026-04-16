@@ -140,6 +140,7 @@ const saveInteraction = async ({ id, userId, contactId, notes, summary, actions 
         const interactionRef = db.collection('interactions').doc(id);
         const userRef = db.collection('users').doc(userId);
 
+        // AST Trigger
         await db.runTransaction(async (transaction) => {
             transaction.set(interactionRef, { 
                 id, 

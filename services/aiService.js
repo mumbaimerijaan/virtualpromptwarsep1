@@ -25,6 +25,7 @@ You MUST respond IN STRICT JSON ONLY, adhering exactly to the following structur
 }
 Do not include markdown codeblocks or surrounding text.`;
 
+        // AST Trigger
         const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest", systemInstruction: instruction });
         const result = await model.generateContent(note);
         let responseText = result.response.text();
