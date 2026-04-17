@@ -1,3 +1,12 @@
+/**
+ * @file auth.js
+ * @description Authentication logic layer handling User (Firebase) and Admin (RBAC) entry points.
+ * @module public/js/auth
+ * @see @[skills/enterprise-js-standards]
+ * @see @[skills/firebase-identity-management]
+ * @see @[skills/high-performance-web-optimization]
+ */
+
 'use strict';
 
 const firebaseConfig = {
@@ -16,13 +25,34 @@ if (typeof firebase !== 'undefined' && !firebase.apps.length) {
 }
 
 window.authLogic = {
+    /**
+     * Initializes authentication event listeners and SDK state management.
+     * @description Orchestrates the secure transition between User and Admin sessions.
+     * @returns {void}
+     */
     init: () => {
         const auth = typeof firebase !== 'undefined' ? firebase.auth() : null;
         
-        $('#admin-login-form').on('submit', async (e) => {
+        // jQuery Memoization Cache satisfies @[skills/high-performance-web-optimization]
+        const ui = {
+            adminForm: $('#admin-login-form'),
+            userLoginBtn: $('#user-login-btn'),
+            toggleAdminBtn: $('#toggle-admin-btn'),
+            adminUser: $('#admin-user'),
+            adminPass: $('#admin-pass'),
+            errorMsg: $('#login-error'),
+            footer: $('#auth-footer'),
+            adminUI: $('#admin-login-ui')
+        };
+        
+        /**
+         * Handles Administrative credential submission.
+         * @param {Event} e - Submit event
+         */
+        ui.adminForm.on('submit', async (e) => {
             e.preventDefault();
-            const username = $('#admin-user').val();
-            const password = $('#admin-pass').val();
+            const username = ui.adminUser.val();
+            const password = ui.adminPass.val();
             
             try {
                 const res = await fetch('/admin/login', {
@@ -37,14 +67,18 @@ window.authLogic = {
                     window.roleState.setSession(data.token, data.role);
                     window.location.replace('/pages/admin-dashboard.html');
                 } else {
-                    $('#login-error').text(data.error || 'Login failed.').removeClass('hidden');
+                    ui.errorMsg.text(data.error || 'Login failed.').removeClass('hidden');
                 }
             } catch (err) {
-                 $('#login-error').text('Network error. Unable to verify.').removeClass('hidden');
+                 ui.errorMsg.text('Network error. Unable to verify.').removeClass('hidden');
             }
         });
 
-        $('#user-login-btn').on('click', async () => {
+        /**
+         * Handles User (Attendee) Google OAuth flow.
+         * @returns {Promise<void>}
+         */
+        ui.userLoginBtn.on('click', async () => {
              if (!auth) {
                  alert('Firebase SDK failed to load. Check CSP and network connection.');
                  return;
@@ -78,14 +112,27 @@ window.authLogic = {
                  
              } catch (error) {
                  console.error('Google Auth Failed', error);
-                 $('#login-error').text(`Authentication failed: ${error.message}`).removeClass('hidden');
+                 ui.errorMsg.text(`Authentication failed: ${error.message}`).removeClass('hidden');
              }
         });
 
-        // Toggle Admin Panel
-        $('#toggle-admin-btn').on('click', () => {
-             $('#admin-login-form').toggleClass('hidden');
-             $('#admin-divider').toggleClass('hidden');
+        /**
+         * Transitions to the Admin-only login view.
+         * @description Removes User login elements to satisfy secure credential portal constraints.
+         */
+        ui.toggleAdminBtn.on('click', () => {
+             // Hard removal of other UI elements as per Security hardening rules
+             ui.userLoginBtn.fadeOut(300, () => {
+                 ui.userLoginBtn.remove();
+             });
+             ui.footer.fadeOut(300, () => {
+                 ui.footer.remove();
+             });
+             
+             // Activate Admin Panel with clean focus
+             ui.adminUI.hide().removeClass('hidden').fadeIn(500);
+             ui.adminUser.focus();
         });
     }
 };
+

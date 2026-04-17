@@ -11,7 +11,7 @@ jest.mock('@google/generative-ai', () => ({
                  if (input === '{"INVALID_JSON') return Promise.resolve({ response: { text: () => '{"INVALID_JSON"' } });
                  return Promise.resolve({
                      response: {
-                        text: () => '```json\n{"summary": "Test Summary.", "keyTakeaways": ["T1"], "actions": ["A1"]}\n```'
+                        text: () => '```json\n{"summary": "Test Summary.", "keyTakeaways": ["T1"], "actions": ["A1"], "networkingStrategy": "S1"}\n```'
                      }
                  });
             })

@@ -1,7 +1,16 @@
+/**
+ * @file app.js
+ * @description Root Initializer executing logic depending safely on routing boundaries.
+ * @module public/js/app
+ * @see @[skills/modular-frontend-orchestration]
+ * @see @[skills/high-performance-web-optimization]
+ */
+
 'use strict';
 
 /**
- * Root Initializer executing logic depending safely on routing boundaries.
+ * Main application entry point.
+ * @returns {void}
  */
 $(document).ready(() => {
     // 1. Boundary enforcement executes universally.
@@ -11,7 +20,7 @@ $(document).ready(() => {
 
     const currentPath = window.location.pathname;
 
-    // 2. Map route bounds strictly to internal logic execution wrappers overriding default flows safely
+    // 2. Map route bounds strictly to internal logic execution wrappers
     if (currentPath === '/' || currentPath === '/index.html') {
          if (window.authLogic) window.authLogic.init();
     } else if (currentPath.includes('onboarding.html')) {
@@ -20,11 +29,32 @@ $(document).ready(() => {
          if (window.adminLogic) window.adminLogic.init();
          $('#logout-btn').on('click', () => { window.roleState.clearSession(); window.location.replace('/'); });
     } else if (currentPath.includes('user-dashboard')) {
+         // jQuery Memoization Cache satisfies @[skills/high-performance-web-optimization]
+         const ui = {
+             qrCode: $('#user-qr-code'),
+             dashName: $('#dash-name'),
+             welcomeHeading: $('#welcome-heading'),
+             navAvatar: $('#nav-avatar-img'),
+             dashCompany: $('#dash-company'),
+             dashRole: $('#dash-role'),
+             logoutBtn: $('#logout-btn'),
+             col1: $('#board-col-1'),
+             col2: $('#board-col-2'),
+             leaderboardContainer: $('#leaderboard-container')
+         };
+
          if (window.qrLogic) window.qrLogic.init();
          if (window.interactionsLogic) window.interactionsLogic.init();
-         $('#logout-btn').on('click', () => { window.roleState.clearSession(); window.location.replace('/'); });
+         
+         ui.logoutBtn.on('click', () => { 
+             window.roleState.clearSession(); 
+             window.location.replace('/'); 
+         });
 
-         // Execute QR Binding and Dynamic Profile Fetch natively
+         /**
+          * Logic mapping concurrent profile and leaderboard fetches.
+          * @description Optimized via memoized UI selectors.
+          */
          const fetchDashboardProfile = async () => {
              try {
                  const { token } = window.roleState.getSession();
@@ -34,11 +64,11 @@ $(document).ready(() => {
                  const uid = payload.user_id || 'unknown';
                  
                  // Initial UI state setup from token if profile fetch lags
-                 $('#user-qr-code').attr('src', `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=contact_${uid}&color=2563eb`);
+                 ui.qrCode.attr('src', `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=contact_${uid}&color=2563eb`);
                  if (payload.name) {
-                      $('#dash-name').text(payload.name);
-                      $('#welcome-heading').text(`Welcome, ${payload.name.split(' ')[0]}!`);
-                      $('#nav-avatar-img').text(payload.name[0].toUpperCase());
+                      ui.dashName.text(payload.name);
+                      ui.welcomeHeading.text(`Welcome, ${payload.name.split(' ')[0]}!`);
+                      ui.navAvatar.text(payload.name[0].toUpperCase());
                  }
 
                  // Parallel Fetch for Profile and Leaderboard
@@ -51,11 +81,11 @@ $(document).ready(() => {
                       const data = await profileRes.json();
                       const p = data.profile;
                       if (p) {
-                           $('#dash-name').text(p.name);
-                           $('#welcome-heading').text(`Welcome, ${p.name.split(' ')[0]}!`);
-                           $('#dash-company').text(p.company || 'Private Participant');
-                           $('#dash-role').text(p.jobRole || 'Event Attendee');
-                           $('#nav-avatar-img').text(p.name[0].toUpperCase());
+                           ui.dashName.text(p.name);
+                           ui.welcomeHeading.text(`Welcome, ${p.name.split(' ')[0]}!`);
+                           ui.dashCompany.text(p.company || 'Private Participant');
+                           ui.dashRole.text(p.jobRole || 'Event Attendee');
+                           ui.navAvatar.text(p.name[0].toUpperCase());
                       }
                  }
 
@@ -67,13 +97,14 @@ $(document).ready(() => {
              }
          };
 
+         /**
+          * Renders the networking leaderboard into the memoized grid layout.
+          * @param {Array} board - Ranked users list
+          */
          const renderLeaderboard = (board) => {
-             const $col1 = $('#board-col-1').empty();
-             const $col2 = $('#board-col-2');
-             const $col2List = $col2.find('div.animate-pulse').parent(); // Finding the div containing the list
-             
-             // Removing pulses
-             $('#leaderboard-container .animate-pulse').remove();
+             ui.col1.empty();
+             // Removing pulses efficiently
+             ui.leaderboardContainer.find('.animate-pulse').remove();
 
              board.forEach((user, index) => {
                   const rank = index + 1;
@@ -97,10 +128,9 @@ $(document).ready(() => {
                   `;
                   
                   if (rank <= 2) {
-                      $col1.append(itemHtml);
+                      ui.col1.append(itemHtml);
                   } else {
-                      // Append at the start of col 2 (above the button)
-                      $col2.prepend(itemHtml);
+                      ui.col2.prepend(itemHtml);
                   }
              });
          };

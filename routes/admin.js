@@ -1,10 +1,18 @@
+/**
+ * @file admin.js
+ * @description Admin-only API routes for global event statistics and audit monitoring.
+ * @module routes/admin
+ * @see @[skills/enterprise-js-standards]
+ * @see @[skills/api-design-for-google-cloud]
+ */
+
 'use strict';
 
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const router = express.Router();
 const { requireAdmin } = require('../middleware/roleMiddleware');
-const { verifyFirebaseToken } = require('../middleware/authMiddleware');
+const { verifyFirebaseToken } = require('../middleware/verifyFirebaseToken');
 const { getAdminStats } = require('../services/firestoreService');
 
 // Used exclusively for generating Admin JWTs independently of Firebase identities.

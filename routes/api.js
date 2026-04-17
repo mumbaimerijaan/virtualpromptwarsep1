@@ -1,8 +1,16 @@
+/**
+ * @file api.js
+ * @description Master API router for user-facing event companion logic.
+ * @module routes/api
+ * @see @[skills/enterprise-js-standards]
+ * @see @[skills/api-design-for-google-cloud]
+ */
+
 'use strict';
 
 const express = require('express');
 const router = express.Router();
-const { verifyFirebaseToken } = require('../middleware/authMiddleware');
+const { verifyFirebaseToken } = require('../middleware/verifyFirebaseToken');
 const { generateInsights } = require('../services/aiService');
 const { saveInteraction, syncUser, updateUserProfile, getUserProfile, getLeaderboard } = require('../services/firestoreService');
 

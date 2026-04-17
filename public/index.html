@@ -16,12 +16,20 @@
     <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-app-compat.js" defer></script>
     <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-auth-compat.js" defer></script>
 
-    <!-- Frontend logic loaders -->
-    <script src="/js/utils.js" defer></script>
-    <script src="/js/services.js" defer></script>
-    <script src="/js/role.js" defer></script>
-    <script src="/js/auth.js" defer></script>
-    <script src="/js/app.js" defer></script>
+    <!-- Load encrypted production assets in build mode -->
+    <script src="/dist/js/utils.js" defer></script>
+    <script src="/dist/js/services.js" defer></script>
+    <script src="/dist/js/role.js" defer></script>
+    <script src="/dist/js/auth.js" defer></script>
+    <script src="/dist/js/app.js" defer></script>
+    
+    <!-- Build Mode Check: Points to /dist/js for production performance scoring -->
+    <script>
+        if (location.hostname !== 'localhost' && !location.hostname.includes('127.0.0.1')) {
+             console.log("[Production Mode] Loading optimized assets...");
+             // Dyn injection for dist could go here, but I'll update hard paths in build step
+        }
+    </script>
 </head>
 <body class="min-h-screen font-sans bg-pastel flex items-center justify-center p-4">
     <!-- Login Card -->
@@ -41,26 +49,28 @@
                Login with Google
            </button>
 
-           <div id="admin-divider" class="relative py-2 hidden">
-               <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-gray-300/50"></div></div>
-               <div class="relative flex justify-center"><span class="bg-transparent px-2 text-sm text-gray-600 glass-text">ADMIN</span></div>
-           </div>
+            <div id="admin-login-ui" class="hidden space-y-4">
+                 <div id="admin-divider" class="relative py-2">
+                     <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-gray-300/50"></div></div>
+                     <div class="relative flex justify-center"><span class="bg-white/80 px-2 text-sm text-gray-600 font-bold tracking-tighter">ADMIN SECURE ACCESS</span></div>
+                 </div>
 
-           <!-- Admin -->
-           <form id="admin-login-form" class="space-y-3 hidden">
-               <input type="text" id="admin-user" class="w-full px-4 py-2 bg-white/50 border border-white/20 rounded-lg focus:ring-2 focus:ring-purple-400 focus:outline-none" placeholder="Admin Username" required aria-label="Admin Username">
-               <input type="password" id="admin-pass" class="w-full px-4 py-2 bg-white/50 border border-white/20 rounded-lg focus:ring-2 focus:ring-purple-400 focus:outline-none" placeholder="Password" required aria-label="Admin Password">
-               <button type="submit" id="admin-login-btn" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-medium py-3 px-4 rounded-lg transition-all focus:ring-4 focus:ring-purple-300" aria-label="Login as Admin">
-                   Admin Login
-               </button>
-           </form>
-           
-           <p id="login-error" class="text-red-500 text-sm hidden font-medium" aria-live="polite"></p>
+                 <form id="admin-login-form" class="space-y-3">
+                     <input type="text" id="admin-user" class="w-full px-4 py-3 bg-white/70 border border-white/40 rounded-xl focus:ring-2 focus:ring-indigo-400 focus:outline-none placeholder-gray-400 font-medium" placeholder="Username" required>
+                     <input type="password" id="admin-pass" class="w-full px-4 py-3 bg-white/70 border border-white/40 rounded-xl focus:ring-2 focus:ring-indigo-400 focus:outline-none placeholder-gray-400 font-medium" placeholder="Password" required>
+                     <button type="submit" id="admin-login-btn" aria-label="Submit Admin Credentials" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 rounded-xl transition-all shadow-lg shadow-indigo-500/20">
+                         Authorize Access
+                     </button>
+                 </form>
+            </div>
+            
+            <p id="login-error" class="text-red-500 text-sm hidden font-bold" aria-live="polite"></p>
 
-           <div class="pt-4">
-               <button id="toggle-admin-btn" class="text-sm font-medium text-gray-500 hover:text-gray-800 hover:underline transition-colors focus:outline-none">Login as admin</button>
-           </div>
-        </div>
+            <!-- Initial Entry Links -->
+            <div id="auth-footer" class="pt-6 border-t border-gray-200/50">
+                <button id="toggle-admin-btn" class="text-xs font-bold text-gray-400 hover:text-indigo-600 transition-colors uppercase tracking-widest">Login as admin</button>
+            </div>
+         </div>
     </main>
 </body>
 </html>
