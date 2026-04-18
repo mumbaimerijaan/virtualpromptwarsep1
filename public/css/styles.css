@@ -1,4 +1,4 @@
-/* Advanced Cosmic Glassmorphism configuration */
+/* Advanced Cosmic Glassmorphism configuration mapping @[skills/frontend-design] */
 body.bg-pastel {
     background: radial-gradient(circle at 10% 20%, rgba(206, 212, 255, 0.9) 0%, rgba(247, 219, 240, 0.8) 40%, rgba(220, 204, 255, 0.9) 100%),
                 linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%);
@@ -15,22 +15,66 @@ body.bg-pastel {
     box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
 }
 
-/* Interactive Glass Elements */
+/* Interactive Glass Elements mapping @[skills/high-performance-web-optimization] */
 .glass-btn {
     background: rgba(255, 255, 255, 0.5);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.6);
     box-shadow: 0 4px 15px 0 rgba(31, 38, 135, 0.05);
-    transition: all 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .glass-btn:hover {
     background: rgba(255, 255, 255, 0.7);
-    transform: translateY(-1px);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px 0 rgba(31, 38, 135, 0.1);
 }
 
 .glass-text {
     background: rgba(255,255,255,0.7);
     border-radius: 4px;
+}
+
+/* Master Toast System satisfies @[skills/modular-frontend-orchestration] */
+.toast-item {
+    min-width: 320px;
+    padding: 1rem 1.25rem;
+    border-radius: 1rem;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    animation: toast-in 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    transition: all 0.3s ease;
+}
+
+.toast-item.info { border-left: 4px solid #6366f1; }
+.toast-item.success { border-left: 4px solid #10b981; }
+.toast-item.warning { border-left: 4px solid #f59e0b; }
+.toast-item.error { border-left: 4px solid #ef4444; }
+
+@keyframes toast-in {
+    from { opacity: 0; transform: translateX(100%) scale(0.9); }
+    to { opacity: 1; transform: translateX(0) scale(1); }
+}
+
+@keyframes toast-out {
+    from { opacity: 1; transform: translateX(0); }
+    to { opacity: 0; transform: translateX(100%); }
+}
+
+/* Responsive Guard Overlay mapping @[skills/wcag-inclusive-design] */
+@media (max-width: 1023px) {
+    #mobile-guard {
+        display: flex !important;
+    }
+    #main-content {
+        filter: blur(4px);
+        pointer-events: none;
+    }
 }

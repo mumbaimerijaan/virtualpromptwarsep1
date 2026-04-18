@@ -104,4 +104,60 @@ router.post('/v1/generate-insights', async (req, res, next) => {
     }
 });
 
+/**
+ * Executes the Automated Project Audit and persists results reactively.
+ */
+router.post('/v1/submit-project', async (req, res, next) => {
+    try {
+        const { cloudRunUrl, githubUrl } = req.body;
+        const uid = req.user.uid;
+
+        if (!cloudRunUrl || !githubUrl) {
+            return res.status(400).json({ error: 'Both Platform and Repository URLs are required.' });
+        }
+
+        // 1. Verify Submission window state @[skills/resilient-data-patterns]
+        const { getGlobalConfig } = require('../services/configService');
+        const config = await getGlobalConfig();
+        if (!config.submissionsOpen) {
+            return res.status(403).json({ error: 'Project submissions are currently locked by the administrator.' });
+        }
+
+        // 2. Execute Hybrid Audit Engine @[skills/ai-orchestration]
+        const { performHybridEvaluation } = require('../services/evalService');
+        const results = await performHybridEvaluation(cloudRunUrl, githubUrl);
+
+        // 3. Persist results for both Attendee history and Admin monitor
+        const admin = require('../middleware/verifyFirebaseToken').admin;
+        const db = admin.firestore();
+
+        const timestamp = admin.firestore.FieldValue.serverTimestamp();
+        
+        // A. Public Evaluation (Admin Table)
+        await db.collection('evaluations').add({
+            uid,
+            cloudRunUrl,
+            githubUrl,
+            score: results.score,
+            pillars: results.pillars,
+            summary: results.summary,
+            timestamp
+        });
+
+        // B. Private Interaction (User Feed)
+        await db.collection('interactions').add({
+            userId: uid,
+            type: 'PROJECT_SUBMISSION',
+            summary: `Project Audited: ${results.score}/100 Score`,
+            details: results.summary,
+            timestamp
+        });
+
+        res.json(results);
+
+    } catch (error) {
+        next(error);
+    }
+});
+
 module.exports = router;

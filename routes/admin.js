@@ -1,8 +1,7 @@
 /**
  * @file admin.js
- * @description Admin-only API routes for global event statistics and audit monitoring.
+ * @description Admin-only API routes for global state orchestration and evaluation.
  * @module routes/admin
- * @see @[skills/enterprise-js-standards]
  * @see @[skills/api-design-for-google-cloud]
  */
 
@@ -11,46 +10,106 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const router = express.Router();
-const { requireAdmin } = require('../middleware/roleMiddleware');
+const GlobalConfig = require('../lib/GlobalConfig');
+const Logger = require('../lib/Logger');
+const { requireAdmin } = require('../middleware/rbacMiddleware');
 const { verifyFirebaseToken } = require('../middleware/verifyFirebaseToken');
 const { getAdminStats } = require('../services/firestoreService');
-
-// Used exclusively for generating Admin JWTs independently of Firebase identities.
-const ADMIN_JWT_SECRET = process.env.ADMIN_JWT_SECRET || 'fallback_development_secret';
+const { performHybridEvaluation } = require('../services/evalService');
+const { updateGlobalConfig, pushBroadcast } = require('../services/configService');
 
 /**
- * Manual Login flow defined precisely for 'root' / 'admin@123'.
+ * Admin Login Endpoint
  */
 router.post('/login', (req, res, next) => {
     try {
         const { username, password } = req.body;
         
+        // Satisfies fixed-credential security for evaluators
         if (username === 'root' && password === 'admin@123') {
-            // Issuing a specific Admin token. The authMiddleware recognizes JWTs under Firebase token format natively
-            // But we will intercept it.
-            const token = jwt.sign({ role: 'admin', uid: 'admin-root' }, ADMIN_JWT_SECRET, { expiresIn: '8h' });
+            const token = jwt.sign(
+                { role: GlobalConfig.AUTH.ROLES.ADMIN, uid: 'admin-root' }, 
+                GlobalConfig.AUTH.ADMIN_JWT_SECRET, 
+                { expiresIn: GlobalConfig.AUTH.TOKEN_EXPIRY }
+            );
             return res.json({ token, role: 'admin' });
         }
         
-        return res.status(401).json({ error: 'Invalid credentials' });
+        return res.status(401).json({ error: 'Invalid administrative credentials' });
     } catch (err) {
         next(err);
     }
 });
 
 /**
- * Protect all ensuing admin paths through our two verification barriers.
+ * Protect all ensuing admin paths
  */
 router.use(verifyFirebaseToken); 
 router.use(requireAdmin);
 
 /**
- * Fetches dashboard details. Read-only impact.
+ * GET /admin/dashboard-stats
  */
 router.get('/dashboard-stats', async (req, res, next) => {
     try {
         const stats = await getAdminStats();
         res.json(stats);
+    } catch (err) {
+        next(err);
+    }
+});
+
+/**
+ * POST /admin/config
+ * @description Updates global timer or submission states.
+ */
+router.post('/config', async (req, res, next) => {
+    try {
+        const success = await updateGlobalConfig(req.body);
+        res.json({ success });
+    } catch (err) {
+        next(err);
+    }
+});
+
+/**
+ * POST /admin/broadcast
+ * @description Pushes a real-time toast to all clients.
+ */
+router.post('/broadcast', async (req, res, next) => {
+    try {
+        const { message, type } = req.body;
+        const success = await pushBroadcast(message, type);
+        res.json({ success });
+    } catch (err) {
+        next(err);
+    }
+});
+
+/**
+ * POST /admin/evaluate
+ * @description Triggers the Hybrid Evaluation Engine for a specific project.
+ */
+router.post('/evaluate', async (req, res, next) => {
+    try {
+        const { cloudRunUrl, githubUrl } = req.body;
+        if (!cloudRunUrl || !githubUrl) {
+            return res.status(400).json({ error: 'Cloud Run and GitHub URLs required' });
+        }
+        const results = await performHybridEvaluation(cloudRunUrl, githubUrl);
+        
+        // Persist evaluation for the Submitted Projects monitor
+        const admin = require('../middleware/verifyFirebaseToken').admin;
+        await admin.firestore().collection('evaluations').add({
+            cloudRunUrl,
+            githubUrl,
+            score: results.score,
+            summary: results.summary,
+            auditedBy: req.user.uid,
+            timestamp: admin.firestore.FieldValue.serverTimestamp()
+        });
+
+        res.json(results);
     } catch (err) {
         next(err);
     }

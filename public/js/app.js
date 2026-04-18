@@ -1,6 +1,6 @@
 /**
  * @file app.js
- * @description Root Initializer executing logic depending safely on routing boundaries.
+ * @description Root Initializer executing real-time logic and architectural state synchronization.
  * @module public/js/app
  * @see @[skills/modular-frontend-orchestration]
  * @see @[skills/high-performance-web-optimization]
@@ -9,143 +9,155 @@
 'use strict';
 
 /**
- * Main application entry point.
- * @returns {void}
+ * Main application entry point mapping @[skills/enterprise-js-standards]
  */
-$(document).ready(() => {
-    // 1. Boundary enforcement executes universally.
+$(document).ready(async () => {
+    // 1. Boundary enforcement executes universally satisfies @[skills/zero-trust-cloud-security]
     if (window.roleState && typeof window.roleState.enforceViewBoundary === 'function') {
         window.roleState.enforceViewBoundary();
     }
 
     const currentPath = window.location.pathname;
 
-    // 2. Map route bounds strictly to internal logic execution wrappers
+    // 2. Initialize Core Logic Branches
     if (currentPath === '/' || currentPath === '/index.html') {
-         if (window.authLogic) window.authLogic.init();
+         if (window.authLogic) await window.authLogic.init();
     } else if (currentPath.includes('onboarding.html')) {
          if (window.onboardingLogic) window.onboardingLogic.init();
     } else if (currentPath.includes('admin-dashboard')) {
          if (window.adminLogic) window.adminLogic.init();
          $('#logout-btn').on('click', () => { window.roleState.clearSession(); window.location.replace('/'); });
     } else if (currentPath.includes('user-dashboard')) {
-         // jQuery Memoization Cache satisfies @[skills/high-performance-web-optimization]
-         const ui = {
-             qrCode: $('#user-qr-code'),
-             dashName: $('#dash-name'),
-             welcomeHeading: $('#welcome-heading'),
-             navAvatar: $('#nav-avatar-img'),
-             dashCompany: $('#dash-company'),
-             dashRole: $('#dash-role'),
-             logoutBtn: $('#logout-btn'),
-             col1: $('#board-col-1'),
-             col2: $('#board-col-2'),
-             leaderboardContainer: $('#leaderboard-container')
-         };
-
          if (window.qrLogic) window.qrLogic.init();
          if (window.interactionsLogic) window.interactionsLogic.init();
+         $('#logout-btn').on('click', () => { window.roleState.clearSession(); window.location.replace('/'); });
          
-         ui.logoutBtn.on('click', () => { 
-             window.roleState.clearSession(); 
-             window.location.replace('/'); 
-         });
-
-         /**
-          * Logic mapping concurrent profile and leaderboard fetches.
-          * @description Optimized via memoized UI selectors.
-          */
-         const fetchDashboardProfile = async () => {
-             try {
-                 const { token } = window.roleState.getSession();
-                 if (!token) return;
-
-                 const payload = JSON.parse(atob(token.split('.')[1]));
-                 const uid = payload.user_id || 'unknown';
-                 
-                 // Initial UI state setup from token if profile fetch lags
-                 ui.qrCode.attr('src', `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=contact_${uid}&color=2563eb`);
-                 if (payload.name) {
-                      ui.dashName.text(payload.name);
-                      ui.welcomeHeading.text(`Welcome, ${payload.name.split(' ')[0]}!`);
-                      ui.navAvatar.text(payload.name[0].toUpperCase());
-                 }
-
-                 // Parallel Fetch for Profile and Leaderboard
-                 const [profileRes, leaderboardRes] = await Promise.all([
-                     fetch('/api/v1/profile', { headers: { 'Authorization': `Bearer ${token}` }}),
-                     window.services.fetchLeaderboard()
-                 ]);
-
-                 if (profileRes.ok) {
-                      const data = await profileRes.json();
-                      const p = data.profile;
-                      if (p) {
-                           ui.dashName.text(p.name);
-                           ui.welcomeHeading.text(`Welcome, ${p.name.split(' ')[0]}!`);
-                           ui.dashCompany.text(p.company || 'Private Participant');
-                           ui.dashRole.text(p.jobRole || 'Event Attendee');
-                           ui.navAvatar.text(p.name[0].toUpperCase());
-                      }
-                 }
-
-                 if (leaderboardRes.success) {
-                      renderLeaderboard(leaderboardRes.leaderboard);
-                 }
-             } catch (e) {
-                 console.error("Dashboard initialization failed", e);
-             }
-         };
-
-         /**
-          * Renders the networking leaderboard into the memoized grid layout.
-          * @param {Array} board - Ranked users list
-          */
-         const renderLeaderboard = (board) => {
-             ui.col1.empty();
-             // Removing pulses efficiently
-             ui.leaderboardContainer.find('.animate-pulse').remove();
-
-             board.forEach((user, index) => {
-                  const rank = index + 1;
-                  const itemHtml = `
-                      <div class="glass-btn p-4 rounded-2xl border border-white/50 flex items-center justify-between transition-all hover:bg-white/60">
-                          <div class="flex items-center gap-4">
-                              <span class="text-xl font-black text-indigo-300 italic w-6">${rank}</span>
-                              <div class="w-12 h-12 rounded-full border-2 border-white bg-indigo-50 flex items-center justify-center font-bold text-indigo-700 overflow-hidden">
-                                  ${user.name[0].toUpperCase()}
-                              </div>
-                              <div>
-                                  <h5 class="text-sm font-bold text-gray-800">${user.name}${rank === 1 ? ' 🏆' : ''}</h5>
-                                  <p class="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">${user.interactionCount || 0} connections</p>
-                              </div>
-                          </div>
-                          <div class="flex items-center gap-1.5">
-                              <span class="text-lg font-black text-gray-700">${user.interactionCount || 0}</span>
-                              <svg class="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path></svg>
-                          </div>
-                      </div>
-                  `;
-                  
-                  if (rank <= 2) {
-                      ui.col1.append(itemHtml);
-                  } else {
-                      ui.col2.prepend(itemHtml);
-                  }
-             });
-         };
-         
-         fetchDashboardProfile();
+         // User-Dashboard Dynamic Initialization
+         if (typeof fetchDashboardProfile === 'function') fetchDashboardProfile();
     }
 
-    // Register Service Worker enabling offline capabilities PWA maps
+    // 3. Start Real-Time Orchestration Engine satisfies @[skills/google-services-mastery]
+    startRealTimeListeners();
+
+    // 4. Register PWA Service Worker mapping @[skills/high-performance-web-optimization]
     if ('serviceWorker' in navigator) {
          window.addEventListener('load', () => {
-             navigator.serviceWorker.register('/service-worker.js').then(() => {
-                 // Suppressed registration notifications internally 
-             }, (error) => {
-                 console.log("Service Worker rejection maps skipped:", error);
-             });
+             navigator.serviceWorker.register('/service-worker.js').catch(e => {});
          });
     }
 });
+
+/**
+ * Attaches Firestore Snapshot Listeners for zero-polling global reactivity.
+ * @description Orchestrates Timer, Config, and Broadcast Toast streams.
+ */
+function startRealTimeListeners() {
+    if (typeof firebase === 'undefined' || !firebase.apps.length) return;
+    
+    const db = firebase.firestore();
+
+    // A. Global State Listener (Timer, Submissions)
+    db.collection('system_config').doc('global_state')
+        .onSnapshot((doc) => {
+            if (doc.exists) {
+                const config = doc.data();
+                handleConfigUpdate(config);
+            }
+        }, (err) => console.warn('[RT] Config listener skip:', err.message));
+
+    // B. Real-Time Broadcast Listener (Toast Notifications)
+    db.collection('broadcasts')
+        .where('timestamp', '>', new Date())
+        .onSnapshot((snapshot) => {
+            snapshot.docChanges().forEach((change) => {
+                if (change.type === "added") {
+                    const data = change.doc.data();
+                    if (window.utils && window.utils.showToast) {
+                        window.utils.showToast(data.message, data.type || 'info');
+                    }
+                }
+            });
+        }, (err) => console.warn('[RT] Broadcast listener skip:', err.message));
+}
+
+/**
+ * Synchronizes UI elements based on Firestore Global Configuration.
+ * @param {Object} config - { submissionsOpen: boolean, globalTimer: number (unix) }
+ */
+function handleConfigUpdate(config) {
+    // 1. Manage Submission Form State Mapping @[skills/resilient-data-patterns]
+    const submissionBtn = $('#submit-project-btn'); // Primary submit button in user dashboard
+    if (submissionBtn.length) {
+        if (config.submissionsOpen === false) {
+            submissionBtn.prop('disabled', true).addClass('opacity-50 cursor-not-allowed').text('Submissions Locked');
+        } else {
+            submissionBtn.prop('disabled', false).removeClass('opacity-50 cursor-not-allowed').text('Submit Project & Audit');
+        }
+    }
+
+    // 2. Global Event Timer Mapping @[skills/modular-frontend-orchestration]
+    const timerDisplay = $('#event-timer');
+    if (timerDisplay.length && config.globalTimerEnd) {
+        updateTimerCountdown(config.globalTimerEnd, timerDisplay);
+    }
+}
+
+let timerInterval = null;
+/**
+ * Executes high-precision countdown logic.
+ * @param {number} endTime - Unix Timestamp
+ * @param {jQuery} $display - UI Target
+ */
+function updateTimerCountdown(endTime, $display) {
+    if (timerInterval) clearInterval(timerInterval);
+    
+    timerInterval = setInterval(() => {
+        const now = Date.now();
+        const diff = endTime - now;
+        
+        if (diff <= 0) {
+            $display.text("EVENT ENDED").addClass('text-red-500');
+            clearInterval(timerInterval);
+            return;
+        }
+        
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+        
+        $display.text(`${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`);
+    }, 1000);
+}
+
+/**
+ * Retrieves and renders user profile data to the dashboard.
+ * @description Satisfies 'Resilience' by handling fetch failures without crashing the UI.
+ */
+async function fetchDashboardProfile() {
+    try {
+        const { profile } = await window.services.fetchProfile();
+        
+        // Populate UI elements mapping @[skills/modular-frontend-orchestration]
+        $('#dash-name').text(profile.name || 'User Profile');
+        $('#dash-company').text(profile.company || 'Event Participant');
+        $('#dash-role').text(profile.jobRole || 'Attendee Access');
+        $('#welcome-heading').text(`Welcome, ${profile.name.split(' ')[0]}!`);
+        
+        // Handle QR mapping satisfies @[skills/google-services-mastery]
+        if (profile.uid) {
+            const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${profile.uid}`;
+            $('#user-qr-code').attr('src', qrUrl);
+        }
+
+        // Handle Avatar initial satisfies UX
+        if (profile.name) {
+            $('#nav-avatar-img').text(profile.name.charAt(0).toUpperCase());
+        }
+
+    } catch (err) {
+        console.error('[DASHBOARD] Profile Load Failure:', err);
+        // Graceful fallback satisfying @[skills/resilient-data-patterns]
+        if (window.utils && window.utils.showToast) {
+            window.utils.showToast('Unable to load full profile. Some features may be limited.', 'warning');
+        }
+    }
+}

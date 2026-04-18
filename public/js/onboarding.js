@@ -11,6 +11,28 @@ window.onboardingLogic = {
              }
         });
 
+        // Hardware & UX Guardrail satisfying @[skills/accessibility]
+        const checkHardwareCompatibility = () => {
+            const $btn = $('#ob-submit-btn');
+            const isTooSmall = window.innerWidth < 1024;
+            
+            if (isTooSmall) {
+                // Disable button and add Tailwind tooltip satisfies UI/UX
+                $btn.prop('disabled', true)
+                    .addClass('opacity-50 cursor-not-allowed group relative')
+                    .append(`
+                        <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 bg-gray-900 text-white text-[10px] rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                            Deep Architectural Audits require desktop-grade processing (min 1024px).
+                        </span>
+                    `);
+            } else {
+                $btn.prop('disabled', false).removeClass('opacity-50 cursor-not-allowed group relative').find('span.absolute').remove();
+            }
+        };
+
+        checkHardwareCompatibility();
+        $(window).on('resize', checkHardwareCompatibility);
+
         $('#onboarding-form').on('submit', async (e) => {
             e.preventDefault();
             

@@ -9,31 +9,33 @@
 
 'use strict';
 
-const firebaseConfig = {
-  apiKey: "AIzaSyAgHDOXTewR5l4Z1mpGpkikrumwbIP1smw",
-  authDomain: "smarteventconcierge.firebaseapp.com",
-  projectId: "smarteventconcierge",
-  storageBucket: "smarteventconcierge.firebasestorage.app",
-  messagingSenderId: "428873326699",
-  appId: "1:428873326699:web:5f3bfd5a9f945c77fb112e",
-  measurementId: "G-D76K8EZX9Y"
-};
-
-// Initialize Firebase App globally for client
-if (typeof firebase !== 'undefined' && !firebase.apps.length) {
-    firebase.initializeApp(firebaseConfig);
-}
-
 window.authLogic = {
     /**
-     * Initializes authentication event listeners and SDK state management.
-     * @description Orchestrates the secure transition between User and Admin sessions.
-     * @returns {void}
+     * Initializes authentication logic by bootstrapping Firebase from the server gateway.
+     * @description Ensures no secrets are hardcoded in the client-side bundle.
+     * @returns {Promise<void>}
      */
-    init: () => {
+    init: async () => {
+        // 1. Fetch Dynamic Configuration Satisfies @[skills/zero-trust-cloud-security]
+        try {
+            const configRes = await fetch('/api/v1/config');
+            if (!configRes.ok) throw new Error('Bootstrap Failure');
+            const firebaseConfig = await configRes.json();
+            console.log('[AUTH] Bootstrapping with domain:', firebaseConfig.authDomain);
+
+            // Initialize Firebase App dynamically
+            if (typeof firebase !== 'undefined' && !firebase.apps.length) {
+                firebase.initializeApp(firebaseConfig);
+            }
+        } catch (err) {
+            console.error('[AUTH] Critical Configuration Error:', err.message);
+            $('#login-error').text('System is currently unavailable. Please contact support.').removeClass('hidden');
+            return;
+        }
+
         const auth = typeof firebase !== 'undefined' ? firebase.auth() : null;
         
-        // jQuery Memoization Cache satisfies @[skills/high-performance-web-optimization]
+        // 2. jQuery Memoization Cache satisfies @[skills/high-performance-web-optimization]
         const ui = {
             adminForm: $('#admin-login-form'),
             userLoginBtn: $('#user-login-btn'),
@@ -118,21 +120,12 @@ window.authLogic = {
 
         /**
          * Transitions to the Admin-only login view.
-         * @description Removes User login elements to satisfy secure credential portal constraints.
          */
         ui.toggleAdminBtn.on('click', () => {
-             // Hard removal of other UI elements as per Security hardening rules
-             ui.userLoginBtn.fadeOut(300, () => {
-                 ui.userLoginBtn.remove();
-             });
-             ui.footer.fadeOut(300, () => {
-                 ui.footer.remove();
-             });
-             
-             // Activate Admin Panel with clean focus
+             ui.userLoginBtn.fadeOut(300, () => ui.userLoginBtn.remove());
+             ui.footer.fadeOut(300, () => ui.footer.remove());
              ui.adminUI.hide().removeClass('hidden').fadeIn(500);
              ui.adminUser.focus();
         });
     }
 };
-

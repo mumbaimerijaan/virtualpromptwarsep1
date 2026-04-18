@@ -11,12 +11,21 @@ jest.mock('@google/generative-ai', () => ({
                  if (input === '{"INVALID_JSON') return Promise.resolve({ response: { text: () => '{"INVALID_JSON"' } });
                  return Promise.resolve({
                      response: {
-                        text: () => '```json\n{"summary": "Test Summary.", "keyTakeaways": ["T1"], "actions": ["A1"], "networkingStrategy": "S1"}\n```'
+                        text: () => '```json\n{"summary": "Test Summary.", "keyTakeaways": ["T1"], "actions": ["A1"]}\n```'
                      }
                  });
             })
         })
-    }))
+    })),
+    HarmCategory: {
+        HARM_CATEGORY_HARASSMENT: 'HARM_CATEGORY_HARASSMENT',
+        HARM_CATEGORY_HATE_SPEECH: 'HARM_CATEGORY_HATE_SPEECH',
+        HARM_CATEGORY_SEXUALLY_EXPLICIT: 'HARM_CATEGORY_SEXUALLY_EXPLICIT',
+        HARM_CATEGORY_DANGEROUS_CONTENT: 'HARM_CATEGORY_DANGEROUS_CONTENT'
+    },
+    HarmBlockThreshold: {
+        BLOCK_NONE: 'BLOCK_NONE'
+    }
 }));
 
 jest.mock('firebase-admin', () => ({

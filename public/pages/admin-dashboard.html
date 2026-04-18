@@ -3,48 +3,153 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard</title>
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://code.jquery.com; connect-src 'self';">
+    <title>Admin Command Center | v5.0 Architect</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+    
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://code.jquery.com https://www.gstatic.com; connect-src 'self' https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://www.gstatic.com https://cdn.tailwindcss.com https://www.googleapis.com https://apis.google.com https://smarteventconcierge.web.app; img-src 'self' data:;">
+    <link rel="icon" href="data:,">
+    
     <link rel="stylesheet" href="/css/styles.css">
     
     <script src="https://cdn.tailwindcss.com" defer></script>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js" defer></script>
     
+    <!-- Firebase Compat SDKs for real-time listeners -->
+    <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-app-compat.js" defer></script>
+    <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore-compat.js" defer></script>
+
     <script src="/dist/js/utils.js" defer></script>
     <script src="/dist/js/services.js" defer></script>
     <script src="/dist/js/role.js" defer></script>
     <script src="/dist/js/admin.js" defer></script>
     <script src="/dist/js/app.js" defer></script>
 </head>
-<body class="min-h-screen font-sans bg-pastel p-4 sm:p-8">
-    <nav class="glass-pwa rounded-xl px-6 py-4 flex justify-between items-center mb-8 max-w-5xl mx-auto shadow-sm">
-        <div>
-            <h1 class="text-xl font-bold tracking-tight text-gray-800">Admin Console</h1>
-            <p class="text-xs text-gray-500 font-medium tracking-wide">LIGHTWEIGHT READ-ONLY OVERVIEW</p>
+<body class="min-h-screen font-sans bg-pastel p-4 lg:p-0 flex flex-col lg:flex-row">
+
+    <!-- Responsive Guard (Desktop Lock) mapping @[skills/wcag-inclusive-design] -->
+    <div id="mobile-guard" class="hidden fixed inset-0 z-[100] bg-white/95 backdrop-blur-md flex flex-col items-center justify-center p-8 text-center lg:hidden">
+        <h2 class="text-2xl font-bold text-gray-900 mb-2">Admin Panel: Desktop Only</h2>
+        <p class="text-gray-600">The Command Center requires high-resolution monitoring. Please switch to a desktop device.</p>
+    </div>
+
+    <!-- Navigation Header mapping @[skills/modular-frontend-orchestration] -->
+    <aside class="lg:w-72 lg:h-screen lg:fixed bg-white/40 backdrop-blur-xl border-r border-white/40 p-6 flex flex-col shadow-2xl z-10">
+        <div class="mb-10">
+            <h1 class="text-2xl font-black text-gray-900 tracking-tighter">MASTER <span class="text-indigo-600">CORE</span></h1>
+            <p class="text-[10px] uppercase font-bold text-gray-400 tracking-widest">v5.0 Architect Edition</p>
         </div>
-        <button id="logout-btn" class="text-sm font-medium text-gray-600 hover:text-red-500 transition-colors" aria-label="Logout Admin">Terminate Session</button>
-    </nav>
 
-    <main class="max-w-5xl mx-auto space-y-6">
+        <nav class="flex-1 space-y-2">
+            <a href="#" class="flex items-center gap-3 p-3 bg-white/60 rounded-xl text-indigo-600 font-bold shadow-sm">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+                Dashboard
+            </a>
+        </nav>
+
+        <div class="pt-6 border-t border-white/40">
+            <button id="logout-btn" class="w-full bg-red-50 text-red-600 font-bold p-3 rounded-xl hover:bg-red-100 transition-colors flex items-center justify-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                Terminate
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content mapping @[skills/accessibility] -->
+    <main class="flex-1 lg:ml-72 p-8 space-y-8">
         
-        <!-- High Level Status Cards -->
-        <section class="grid grid-cols-1 md:grid-cols-2 gap-6" aria-label="Core Metrics">
-             <div class="glass-pwa rounded-2xl p-6 text-center shadow-md">
-                 <h2 class="text-sm uppercase text-gray-500 font-bold tracking-widest mb-2">Total Participants</h2>
-                 <p id="stat-users" class="text-5xl font-black text-gray-800">...</p>
-             </div>
-             
-             <div class="glass-pwa rounded-2xl p-6 text-center shadow-md">
-                 <h2 class="text-sm uppercase text-gray-500 font-bold tracking-widest mb-2">AI Interactions Captured</h2>
-                 <p id="stat-interactions" class="text-5xl font-black text-blue-600">...</p>
-             </div>
-        </section>
+        <!-- Metrics Section satisfies @[skills/high-performance-web-optimization] -->
+        <header class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="glass-pwa rounded-2xl p-6 flex flex-col justify-between h-32">
+                <span class="text-[10px] font-black text-indigo-500 uppercase tracking-widest">Active Attendees</span>
+                <p id="stat-users" class="text-4xl font-black text-gray-800 tracking-tighter">0</p>
+            </div>
+            <div class="glass-pwa rounded-2xl p-6 flex flex-col justify-between h-32">
+                <span class="text-[10px] font-black text-blue-500 uppercase tracking-widest">AI Generated Nodes</span>
+                <p id="stat-interactions" class="text-4xl font-black text-gray-800 tracking-tighter">0</p>
+            </div>
+            <div class="glass-pwa rounded-2xl p-6 flex flex-col justify-between h-32 bg-indigo-600">
+                <span class="text-[10px] font-black text-white/70 uppercase tracking-widest">Remaining Time</span>
+                <p id="event-timer" class="text-4xl font-black text-white tracking-tighter">--:--</p>
+            </div>
+        </header>
 
-        <!-- Recent Activity Feed -->
-        <section class="glass-pwa rounded-2xl p-6 shadow-sm" aria-label="Recent Audit Feed">
-            <h2 class="text-lg font-bold text-gray-900 border-b border-gray-300 pb-3 mb-4">Recent Activity (Global)</h2>
+        <!-- Main Dashboard Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            
+            <!-- Submission Control mapping v5.1 -->
+            <section class="glass-pwa rounded-3xl p-8 space-y-6">
+                <h2 class="text-xl font-bold text-gray-900 flex items-center gap-2">
+                    <div class="w-2 h-2 bg-indigo-600 rounded-full animate-pulse"></div>
+                    Submission Control
+                </h2>
+                <div class="space-y-4 pt-2">
+                    <div class="space-y-2">
+                        <label class="text-xs font-bold text-gray-400 uppercase tracking-widest">Round Duration (Minutes)</label>
+                        <input type="number" id="timer-input" value="60" class="w-full bg-white/40 border border-white/60 rounded-xl p-4 focus:ring-4 focus:ring-indigo-100 outline-none text-xl font-black text-indigo-600 transition-all disabled:opacity-50 disabled:bg-indigo-50/30">
+                    </div>
+                    <div class="pt-2">
+                        <button id="start-submission-btn" class="w-full bg-indigo-600 text-white font-black py-4 rounded-2xl hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-200 active:scale-[0.98]">
+                            START SUBMISSION
+                        </button>
+                        <button id="end-submission-btn" class="hidden w-full bg-red-500 text-white font-black py-4 rounded-2xl hover:bg-red-600 transition-all shadow-xl shadow-red-200 animate-pulse">
+                            END SUBMISSION
+                        </button>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Broadcast & Audio Controls Mapping Toasts requirements -->
+            <section class="glass-pwa rounded-3xl p-8 space-y-6">
+                <h2 class="text-xl font-bold text-gray-900 flex items-center gap-2">
+                    <div class="w-2 h-2 bg-pink-500 rounded-full"></div>
+                    Real-Time Broadcasting
+                </h2>
+                <div class="space-y-4 pt-2">
+                    <textarea id="broadcast-msg" rows="3" placeholder="Compose a message for all active dashboards..." class="w-full bg-white/40 border border-white/60 rounded-xl p-4 focus:ring-4 focus:ring-indigo-100 outline-none text-sm font-medium transition-all"></textarea>
+                    <div class="flex gap-2">
+                        <button onclick="window.adminLogic.sendToast('info')" class="flex-1 bg-blue-50 text-blue-600 font-bold py-3 rounded-xl hover:bg-blue-100 transition-all text-xs">INFO</button>
+                        <button onclick="window.adminLogic.sendToast('warning')" class="flex-1 bg-yellow-50 text-yellow-600 font-bold py-3 rounded-xl hover:bg-yellow-100 transition-all text-xs">ALERT</button>
+                        <button onclick="window.adminLogic.sendToast('success')" class="flex-1 bg-emerald-50 text-emerald-600 font-bold py-3 rounded-xl hover:bg-emerald-100 transition-all text-xs">START</button>
+                    </div>
+                </div>
+            </section>
+            <!-- Submitted Projects Monitor mapping v5.0 Master Architect -->
+            <section class="glass-pwa rounded-3xl p-8 space-y-6 lg:col-span-2">
+                <h2 class="text-xl font-bold text-gray-900 flex items-center gap-2">
+                    <div class="w-2 h-2 bg-emerald-500 rounded-full"></div>
+                    Submitted Projects
+                </h2>
+                <div class="overflow-hidden rounded-2xl border border-white/40">
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-white/50 text-gray-400 font-bold uppercase text-[10px] tracking-widest">
+                            <tr>
+                                <th class="px-6 py-4">Participant</th>
+                                <th class="px-6 py-4">Project / URL</th>
+                                <th class="px-6 py-4 text-right">Score</th>
+                            </tr>
+                        </thead>
+                        <tbody id="submissions-list" class="divide-y divide-white/20 bg-white/20 text-gray-800">
+                            <!-- Injected dynamically -->
+                            <tr>
+                                <td colspan="3" class="px-6 py-8 text-center text-gray-400 italic font-medium">No audited submissions recorded yet.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+        </div>
+
+        <!-- Global Activity Audit mapping @[skills/resilient-data-patterns] -->
+        <section class="glass-pwa rounded-3xl p-8">
+            <div class="flex justify-between items-center border-b border-white/40 pb-6 mb-8">
+                <h2 class="text-xl font-bold text-gray-900">Live Interaction Audit</h2>
+                <span class="bg-indigo-100 text-indigo-600 text-[10px] font-black px-3 py-1 rounded-full tracking-widest uppercase">Encryption Active</span>
+            </div>
             <div id="admin-feed-container" class="space-y-4" aria-live="polite">
-                <!-- Injected via admin.js -->
+                <!-- Feed injected dynamically -->
             </div>
         </section>
 

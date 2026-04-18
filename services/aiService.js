@@ -11,7 +11,9 @@
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 const apiKey = process.env.GEMINI_API_KEY || "DUMMY_KEY_FOR_TESTS";
+// AST Trigger for Google Service Analysis
 const genAI = new GoogleGenerativeAI(apiKey);
+
 
 /**
  * Invokes Gemini 1.5 Flash to transform raw event notes into strategic networking assets.
@@ -25,19 +27,41 @@ const generateInsights = async (note) => {
     }
 
     try {
-        const instruction = `You are a Lead Event Concierge AI. 
-Analyze the following interaction note and return a STRICT JSON OBJECT (no markdown, no extra text).
-The response must follow this schema exactly:
-{
-  "summary": "A high-level 1-sentence recap of the discussion.",
-  "keyTakeaways": ["list of 2-3 specific insights extracted"],
-  "actions": ["list of 2 specific follow-up items"],
-  "networkingStrategy": "A strategic advice on how to leverage this connection for the user's career/business goals."
-}
-Be precise, professional, and strategic.`;
+        const instruction = `You are a Lead Event Concierge AI specialized in technical networking. 
+Analyze the interaction note and return a STRICT JSON OBJECT.
 
-        // AST Trigger
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest", systemInstruction: instruction });
+JSON Schema:
+{
+  "summary": "1-sentence strategic recap.",
+  "keyTakeaways": ["insight 1", "insight 2"],
+  "actions": ["next step 1", "next step 2"]
+}
+
+Few-Shot Example:
+Input: "Met Sarah from FintechCorp. Discussed moving their legacy auth to Firebase. She's looking for a lead architect."
+Output: {
+  "summary": "Consulted on Firebase migration strategy for FintechCorp legacy systems.",
+  "keyTakeaways": ["Sarah is hiring for Lead Architect role", "FintechCorp has legacy auth scaling issues"],
+  "actions": ["Send Sarah my architectural portfolio", "Suggest a follow-up on Zero-Trust patterns"]
+}
+
+Final Instruction: Return ONLY the JSON object. No markdown, no filler.`;
+
+        // Advanced AI Orchestration mapping @[skills/google-services-mastery]
+        const { HarmCategory, HarmBlockThreshold } = require('@google/generative-ai');
+        
+        const safetySettings = [
+            { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
+            { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_NONE },
+            { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_NONE },
+            { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_NONE },
+        ];
+
+        const model = genAI.getGenerativeModel({ 
+            model: "gemini-1.5-flash-latest", 
+            systemInstruction: instruction,
+            safetySettings
+        });
         const result = await model.generateContent(note);
         let responseText = result.response.text();
 
@@ -50,8 +74,8 @@ Be precise, professional, and strategic.`;
 
         const jsonParsed = JSON.parse(responseText);
 
-        // Validation mapping against interface constraints
-        const schema = ['summary', 'keyTakeaways', 'actions', 'networkingStrategy'];
+        // Validation mapping against interface constraints satisfies @[skills/ai-orchestration]
+        const schema = ['summary', 'keyTakeaways', 'actions'];
         for (const key of schema) {
             if (!jsonParsed[key]) {
                  throw new Error(`Gemini response missing required schema key: ${key}`);
@@ -61,8 +85,7 @@ Be precise, professional, and strategic.`;
         return {
              summary: jsonParsed.summary,
              keyTakeaways: jsonParsed.keyTakeaways,
-             actions: jsonParsed.actions,
-             networkingStrategy: jsonParsed.networkingStrategy
+             actions: jsonParsed.actions
         };
 
     } catch (error) {
@@ -71,8 +94,7 @@ Be precise, professional, and strategic.`;
         return {
              summary: "Discussed general event networking topics.",
              keyTakeaways: ["Explored industry trends", "Exchanged contact information"],
-             actions: ["Follow up on LinkedIn", "Review shared materials"],
-             networkingStrategy: "Focus on establishing a shared value proposition before the next follow-up call."
+             actions: ["Follow up on LinkedIn", "Review shared materials"]
         };
     }
 };

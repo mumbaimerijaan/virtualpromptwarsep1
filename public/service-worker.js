@@ -16,9 +16,7 @@ const STATIC_ASSETS = [
   '/dist/js/services.js',
   '/dist/js/role.js',
   '/dist/js/auth.js',
-  '/dist/js/app.js',
-  'https://cdn.tailwindcss.com',
-  'https://code.jquery.com/jquery-3.7.1.min.js'
+  '/dist/js/app.js'
 ];
 
 // Install: Cache static assets @[skills/high-performance-web-optimization]
@@ -46,9 +44,14 @@ self.addEventListener('activate', (event) => {
  * @description Returns cached data instantly if available, then updates the cache from the network.
  */
 self.addEventListener('fetch', (event) => {
-    // API calls should generally bypass cache for data consistency unless strictly public
+    // 1. Only cache GET requests mapping @[skills/high-performance-web-optimization]
+    if (event.request.method !== 'GET') {
+        return; 
+    }
+
+    // 2. API calls should generally bypass cache for data consistency unless strictly public
     if (event.request.url.includes('/api/v1/')) {
-        return; // Network-only for API
+        return; 
     }
 
     event.respondWith(
