@@ -24,7 +24,8 @@ window.interactionsLogic = {
             scoreText: $('#eval-score'),
             pillarsContainer: $('#eval-pillars'),
             summaryText: $('#eval-summary'),
-            timerDisplay: $('#event-timer')
+            timerDisplay: $('#event-timer'),
+            narrator: $('#submission-status-narrative')
         };
 
         /**
@@ -44,8 +45,10 @@ window.interactionsLogic = {
             // UI Lock mapping @[skills/high-performance-web-optimization]
             ui.submitBtn.prop('disabled', true).text('AUDITING...').addClass('animate-pulse');
             ui.resultArea.addClass('hidden');
+            if (ui.narrator.length) ui.narrator.text('Submission starting. Engaging Automated Project Auditor.');
 
             try {
+                if (ui.narrator.length) ui.narrator.text('System is evaluating your Cloud Run deployment and GitHub repository.');
                 const result = await window.services.submitProject(cloudRunUrl, githubUrl);
                 
                 // Render Scores efficiently mapping @[skills/modular-frontend-orchestration]
@@ -69,6 +72,7 @@ window.interactionsLogic = {
                 `);
 
                 ui.resultArea.removeClass('hidden');
+                if (ui.narrator.length) ui.narrator.text(`Audit complete. Your project score is ${result.score} out of 100.`);
                 window.utils.showToast('Audit Complete: Project Evaluated', 'success');
                 
                 // Reset inputs for clean state satisfies UX
@@ -76,7 +80,9 @@ window.interactionsLogic = {
                 ui.githubUrl.val('');
 
             } catch (err) {
-                 window.utils.showToast(err.message || 'Audit failed. Check service health.', 'error');
+                 const errMsg = err.message || 'Audit failed. Check service health.';
+                 if (ui.narrator.length) ui.narrator.text(`Evaluation error: ${errMsg}`);
+                 window.utils.showToast(errMsg, 'error');
                  console.error('[AUDIT]', err);
             } finally {
                  ui.submitBtn.prop('disabled', false).text('Submit Project & Audit').removeClass('animate-pulse');

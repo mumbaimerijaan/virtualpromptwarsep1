@@ -17,7 +17,7 @@ jest.mock('@google-cloud/vertexai', () => ({
                 response: {
                     candidates: [{
                         content: {
-                            parts: [{ text: '{"summary": "Integrated Summary", "keyTakeaways": ["T1"], "actions": ["A1"]}' }]
+                            parts: [{ text: '{"summary": "Integrated Summary", "keyTakeaways": ["T1"], "actions": ["A1"], "score": 95, "pillars": {"security": 95, "efficiency": 95, "googleServices": 95}}' }]
                         }
                     }]
                 }
@@ -42,13 +42,16 @@ jest.mock('firebase-admin', () => {
         set: jest.fn().mockResolvedValue(true),
         update: jest.fn().mockResolvedValue(true),
         get: jest.fn().mockResolvedValue({ exists: true, data: () => ({ name: 'Test User' }) }),
-        add: jest.fn().mockResolvedValue({ id: 'new-id' })
+        add: jest.fn().mockResolvedValue({ id: 'new-id' }),
+        orderBy: jest.fn().mockReturnThis(),
+        limit: jest.fn().mockReturnThis()
     };
     return {
         apps: [],
         initializeApp: jest.fn(),
+        app: jest.fn().mockReturnValue({ options: { projectId: 'test-project' } }),
         appCheck: jest.fn().mockReturnValue({ verifyToken: jest.fn().mockResolvedValue(true) }),
-        auth: jest.fn().mockReturnValue({ verifyIdToken: jest.fn().mockResolvedValue({ uid: 'usr123' }) }),
+        auth: jest.fn().mockReturnValue({ verifyIdToken: jest.fn().mockResolvedValue({ uid: 'usr123', role: 'admin' }) }),
         firestore: Object.assign(jest.fn().mockReturnValue(mockFirestore), { 
             FieldValue: { serverTimestamp: jest.fn(), increment: jest.fn() } 
         })
@@ -67,9 +70,9 @@ jest.mock('google-auth-library', () => ({
 const request = require('supertest');
 const app = require('../server');
 
-describe('Smart Event Concierge - Architect Resilience Matrix', () => {
+describe('Smart Event Concierge - Architect Resilience Matrix (v8.0)', () => {
     
-    test('Cloud Run Lifecycle: Auth -> Onboarding -> AI -> Trace', async () => {
+    test('Cloud Run Lifecycle: Auth -> Onboarding -> AI -> Audit', async () => {
         const authHeader = 'Bearer test-token';
         
         // 1. High-Resilience Onboarding
@@ -79,27 +82,38 @@ describe('Smart Event Concierge - Architect Resilience Matrix', () => {
             .set('X-Firebase-AppCheck', 'valid-app-check')
             .send({ payload: { company: 'Google', jobRole: 'Architect' } });
         
-        // We handle potential 500s during test env setup by logging the body for better debugging
-        if (onboardingRes.status !== 200) {
-            console.error('[TEST ERROR] Onboarding Failed:', onboardingRes.body);
-        }
         expect(onboardingRes.status).toBe(200);
 
-        // 2. Resilient AI Generation (Vertex AI Mock)
-        const aiRes = await request(app)
-            .post('/api/v1/generate-insights')
+        // 2. Automated Project Auditor FlowMapping @[skills/ai-orchestration]
+        const auditRes = await request(app)
+            .post('/api/v1/submit-project')
             .set('Authorization', authHeader)
             .set('X-Firebase-AppCheck', 'valid-app-check')
-            .send({ notes: 'Networking with resilience lead' });
+            .send({ 
+                cloudRunUrl: 'https://test-project.run.app',
+                githubUrl: 'https://github.com/test/repo'
+            });
         
-        expect(aiRes.status).toBe(200);
-        expect(aiRes.body.summary).toBe('Integrated Summary');
+        expect(auditRes.status).toBe(200);
+        expect(auditRes.body.score).toBeGreaterThanOrEqual(0);
+        expect(auditRes.body.summary).toBe('Integrated Summary');
     });
 
-    test('Zero-Trust: App Check Passthrough', async () => {
+    test('Zero-Trust Infrastructure: Nuclear App Check Enforcement', async () => {
+         // Should fail without X-Firebase-AppCheck even in development (Hardened v8.0)
          const res = await request(app)
             .get('/api/v1/leaderboard')
             .set('Authorization', 'Bearer valid-token');
-         expect(res.status).toBe(200);
+         
+         expect(res.status).toBe(401);
+         expect(res.body.error).toContain('App Check token missing');
+    });
+
+    test('Success with App Check token', async () => {
+        const res = await request(app)
+           .get('/api/v1/leaderboard')
+           .set('Authorization', 'Bearer valid-token')
+           .set('X-Firebase-AppCheck', 'valid-token');
+        expect(res.status).toBe(200);
     });
 });

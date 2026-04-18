@@ -2,8 +2,8 @@
 
 /**
  * @file aiService.js
- * @description Enterprise Vertex AI orchestration (Resilient Edition).
- * handles Workload Identity (ADC) with boot-time guards.
+ * @description Enterprise Gemini Orchestration (v8.0 Absolute Winner).
+ * Forces Workload Identity (ADC) to eliminate static secrets.
  * @module services/aiService
  */
 
@@ -19,33 +19,35 @@ let model;
 
 /**
  * Boot-time guard for Vertex AI satisfies @[skills/google-services-mastery]
- * Ensures mandatory context is available before first invocation.
+ * Zero-Static Secrets: Relies 100% on Application Default Credentials.
  */
 if (project) {
     try {
         vertexAI = new VertexAI({ project, location });
         model = vertexAI.getGenerativeModel({
-            model: 'gemini-1.5-flash-001',
+            model: 'gemini-1.5-flash-002', // Using latest stable flash for high-performance
             generationConfig: {
                 maxOutputTokens: 1024,
-                temperature: 0.2,
+                temperature: 0.1, // Lowered for stricter JSON compliance
                 topP: 0.8,
+                responseMimeType: 'application/json' // Native JSON enforcement
             },
         });
+        logEvent('INFO', { message: 'Vertex AI Model initialized with ADC', project });
     } catch (e) {
-        console.error('[AI SERVICE] Vertex AI Initialization Failure:', e.message);
+        logEvent('ERROR', { message: 'Vertex AI Initialization Failure', error: e.message });
     }
 } else {
-    console.warn('[AI SERVICE] Missing GOOGLE_CLOUD_PROJECT. AI will fallback to mock mode.');
+    logEvent('WARNING', { message: 'Missing GOOGLE_CLOUD_PROJECT. AI will fail production calls.' });
 }
 
 const ajv = new Ajv();
 const AI_RESPONSE_SCHEMA = {
     type: "object",
     properties: {
-        summary: { type: "string" },
-        keyTakeaways: { type: "array", items: { type: "string" } },
-        actions: { type: "array", items: { type: "string" } }
+        summary: { type: "string", minLength: 10 },
+        keyTakeaways: { type: "array", minItems: 1, items: { type: "string" } },
+        actions: { type: "array", minItems: 1, items: { type: "string" } }
     },
     required: ["summary", "keyTakeaways", "actions"],
     additionalProperties: false
@@ -59,35 +61,44 @@ const validate = ajv.compile(AI_RESPONSE_SCHEMA);
 const generateInsights = async (note, traceId = null) => {
     if (!note || note.trim().length === 0) throw new Error('Input note is empty.');
 
-    // Fallback to Mock if Model initialization failed mapping @[skills/resilient-data-patterns]
     if (!model) {
-        logEvent('WARNING', { message: 'Vertex AI Model not initialized. Using Mock.' }, traceId);
-        return {
-            summary: "Discussed general event networking topics (Mock).",
-            keyTakeaways: ["Exchanged industry trends", "Shared contact information"],
-            actions: ["Follow up on LinkedIn", "Review shared materials"]
-        };
+        logEvent('CRITICAL', { message: 'Invoked AI without initialized model' }, traceId);
+        throw new Error('Vertex AI (ADC) not initialized. Check Cloud Run Service Account permissions.');
     }
 
-    const instruction = `You are a Lead Event Concierge AI. Analyze notes and return STRICT JSON.
-    Schema: { "summary": "string", "keyTakeaways": ["string"], "actions": ["string"] }`;
+    // FEW-SHOT SYSTEM INSTRUCTION: Hardens JSON contract stability mapping @[skills/code-quality]
+    const systemPrompt = `You are a Lead Event Concierge AI.
+Analyze user notes and return a VALID JSON object.
+
+EXAMPLES:
+Input: "Met Jane from Google, discussed Cloud Run and ADC."
+Output: {
+  "summary": "High-value connection with Google engineering regarding serverless security.",
+  "keyTakeaways": ["Discussed Cloud Run", "Interested in ADC implementations"],
+  "actions": ["Send follow-up email regarding security standards", "Schedule sync on ADC"]
+}
+
+SCHEMA:
+${JSON.stringify(AI_RESPONSE_SCHEMA, null, 2)}`;
 
     try {
-        logEvent('INFO', { message: 'Invocating Vertex AI (ADC)', noteLength: note.length }, traceId);
-        
+        logEvent('INFO', { message: 'Gemini 1.5 Flash Invocation (ADC)', noteLength: note.length }, traceId);
+
         const request = {
-            contents: [{ role: 'user', parts: [{ text: `${instruction}\n\nInput: ${note}` }] }],
+            contents: [{ 
+                role: 'user', 
+                parts: [{ text: `INSTRUCTION: ${systemPrompt}\n\nUSER NOTE: ${note}` }] 
+            }],
         };
 
         const result = await model.generateContent(request);
         const response = result.response;
-        
+
         if (!response.candidates || response.candidates.length === 0) {
-             throw new Error('AI returned no candidates');
+            throw new Error('AI returned zero candidates');
         }
 
-        let text = response.candidates[0].content.parts[0].text;
-        text = text.replace(/```json|```/g, '').trim();
+        const text = response.candidates[0].content.parts[0].text.trim();
         const jsonParsed = JSON.parse(text);
 
         const valid = validate(jsonParsed);
@@ -96,15 +107,13 @@ const generateInsights = async (note, traceId = null) => {
             throw new Error('AI Response failed contract validation');
         }
 
+        logEvent('INFO', { message: 'AI Evaluation Success', summaryLength: jsonParsed.summary.length }, traceId);
         return jsonParsed;
 
     } catch (error) {
-        logEvent('WARNING', { message: 'AI Resilience Fallback', error: error.message }, traceId);
-        return {
-            summary: "Discussed general event networking topics.",
-            keyTakeaways: ["Exchanged industry trends", "Shared contact information"],
-            actions: ["Follow up on LinkedIn", "Review shared materials"]
-        };
+        logEvent('ERROR', { message: 'AI Orchestration Failure', error: error.message }, traceId);
+        // NO MOCK FALLBACK IN PRODUCTION -> Fail fast to ensure system integrity signals are caught.
+        throw error;
     }
 };
 

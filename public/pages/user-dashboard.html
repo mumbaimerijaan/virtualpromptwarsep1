@@ -95,10 +95,14 @@
                         <input type="url" id="github-url" placeholder="https://github.com/user/repo" class="w-full bg-white/40 border border-white/60 rounded-xl p-4 focus:ring-4 focus:ring-indigo-100 outline-none text-sm font-medium transition-all">
                     </div>
                     
-                    <button id="submit-project-btn" class="w-full bg-gray-900 text-white font-bold py-4 rounded-xl hover:bg-black transition-all shadow-xl disabled:opacity-50 flex items-center justify-center gap-3">
+                    <button id="submit-project-btn" class="w-full bg-gray-900 text-white font-bold py-4 rounded-xl hover:bg-black transition-all shadow-xl disabled:opacity-50 flex items-center justify-center gap-3" aria-live="off">
                         <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg>
                         Submit Project & Audit
                     </button>
+
+                    <!-- ARIA Narrator Territory mapping @[skills/wcag-inclusive-design] -->
+                    <div id="submission-status-narrative" class="sr-only" aria-live="polite"></div>
+
                     <p class="text-[10px] text-gray-400 font-bold text-center uppercase tracking-widest py-2">Real-time Hybrid Evaluation using Gemini 1.5</p>
                 </div>
 

@@ -20,21 +20,7 @@ $(document).ready(async () => {
         window.roleState.enforceViewBoundary();
     }
 
-    const currentPath = window.location.pathname.replace(/\/$/, "") || "/";
-
     if (currentPath === "/" || currentPath === "/index.html") {
-         if (window.authLogic) await window.authLogic.init();
-    } else if (currentPath === '/onboarding') {
-         if (window.onboardingLogic) window.onboardingLogic.init();
-    } else if (currentPath === '/admin') {
-         if (window.adminLogic) window.adminLogic.init();
-    } else if (currentPath === '/dashboard') {
-         if (window.qrLogic) window.qrLogic.init();
-         if (window.interactionsLogic) window.interactionsLogic.init();
-         if (typeof fetchDashboardProfile === 'function') fetchDashboardProfile();
-    }
-
-    if (currentPath === '/' || currentPath === '/index.html') {
          if (window.authLogic) await window.authLogic.init();
     } else if (currentPath === '/onboarding') {
          if (window.onboardingLogic) window.onboardingLogic.init();
@@ -87,7 +73,10 @@ function handleConfigUpdate(config) {
     if (submissionBtn.length) {
         if (config.submissionsOpen === false) {
             submissionBtn.prop('disabled', true).addClass('opacity-50');
-            if (statusMsg.length) statusMsg.text('Submission portal is currently locked by the event architect.');
+            if (statusMsg.length) {
+                statusMsg.text('Submission portal is currently locked by the event architect.');
+                window.utils.showToast('Submissions Locked', 'warning');
+            }
         } else {
             submissionBtn.prop('disabled', false).removeClass('opacity-50');
             if (statusMsg.length) statusMsg.text('Submission portal is open and ready for project audits.');

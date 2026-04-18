@@ -1,15 +1,12 @@
+require('@google-cloud/trace-agent').start();
 /**
  * @file server.js
- * @description Master entry point (v7.0 - Absolute Restoration).
+ * @description Master entry point (v8.0 - Absolute Winner).
  * Orchestrates Identity, Strict CSP, and High-Precedence Friendly Routing.
  * @module server
  */
 
 'use strict';
-
-console.log('--------------------------------------------------');
-console.log('[ARCHITECT] Applying v7.0 Security & Routing Stack');
-console.log('--------------------------------------------------');
 
 require('dotenv').config();
 
@@ -35,12 +32,12 @@ const publicPath = path.join(__dirname, 'public');
 // --- 1. ABSOLUTE PRECEDENCE UI ROUTES ---
 // Prioritized above ALL middleware to ensure zero interference.
 app.get(['/onboarding', '/onboarding/'], (req, res) => {
-    console.log('[ROUTER] Serving Onboarding UI');
+    logEvent('INFO', { message: 'Serving Onboarding UI', path: req.path });
     res.sendFile(path.join(publicPath, 'pages', 'onboarding.html'));
 });
 
 app.get(['/dashboard', '/dashboard/'], (req, res) => {
-    console.log('[ROUTER] Serving Dashboard UI');
+    logEvent('INFO', { message: 'Serving Dashboard UI', path: req.path });
     res.sendFile(path.join(publicPath, 'pages', 'user-dashboard.html'));
 });
 
@@ -49,7 +46,7 @@ app.get(['/admin', '/admin/'], (req, res, next) => {
     if (req.originalUrl.includes('/admin/api') || req.originalUrl.includes('/admin/evaluate') || req.originalUrl.includes('/admin/config')) {
         return next();
     }
-    console.log('[ROUTER] Serving Admin UI');
+    logEvent('INFO', { message: 'Serving Admin UI', path: req.path });
     res.sendFile(path.join(publicPath, 'pages', 'admin-dashboard.html'));
 });
 
@@ -125,23 +122,27 @@ app.use(helmet({
 
 if (!admin.apps.length) {
     try {
-        admin.initializeApp({
-            projectId: process.env.GOOGLE_CLOUD_PROJECT || 'smarteventconcierge'
-        });
-        console.log(`[AUTH] Firebase Admin initialized for ${admin.app().options.projectId}`);
+        const projectId = admin.app().options.projectId || process.env.GOOGLE_CLOUD_PROJECT || 'smarteventconcierge';
+        logEvent('INFO', { message: 'Firebase Admin initialized', projectId });
     } catch (e) {
-        console.error('[AUTH] Firebase Admin failed to initialize:', e.message);
+        logEvent('ERROR', { message: 'Firebase Admin initialization failed', error: e.message });
     }
 }
 
+/**
+ * Nuclear App Check Enforcement Mapping @[skills/zero-trust-cloud-security]
+ */
 const firebaseAppCheckMiddleware = async (req, res, next) => {
-    if (process.env.NODE_ENV !== 'production') return next(); 
     const appCheckToken = req.header('X-Firebase-AppCheck');
-    if (!appCheckToken) return res.status(401).json({ error: 'Unauthorized: App Check token missing' });
+    if (!appCheckToken) {
+        logEvent('WARNING', { message: 'Denying request: Missing App Check token', path: req.path });
+        return res.status(401).json({ error: 'Unauthorized: App Check token missing' });
+    }
     try {
         await admin.appCheck().verifyToken(appCheckToken);
         next();
     } catch (err) {
+        logEvent('ERROR', { message: 'Denying request: Invalid App Check token', path: req.path, error: err.message });
         res.status(401).json({ error: 'Unauthorized: Invalid App Check token' });
     }
 };
@@ -174,15 +175,14 @@ app.use((req, res) => {
 
 let server;
 const startServer = (portToTry) => {
-    console.log(`[BOOT] Attempting listen on ${portToTry}...`);
+    logEvent('INFO', { message: 'Attempting server listen', port: portToTry });
     server = app.listen(portToTry, () => {
-        console.log(`[BOOT] Server ACTIVE on port ${portToTry}`);
-        logEvent('INFO', { message: 'System Bootstrapped', port: portToTry });
+        logEvent('INFO', { message: 'Server ACTIVE', port: portToTry });
     }).on('error', (err) => {
         if (err.code === 'EADDRINUSE' && portToTry < (parseInt(initialPort) + 5)) {
             startServer(portToTry + 1);
         } else {
-            console.error(`[FATAL] Startup failed: ${err.message}`);
+            logEvent('EMERGENCY', { message: 'Startup failed', error: err.message });
             process.exit(1);
         }
     });
@@ -193,7 +193,7 @@ if (require.main === module) {
 }
 
 process.on('SIGTERM', () => {
-    console.log('[BOOT] SIGTERM received. Closing server.');
+    logEvent('WARNING', { message: 'SIGTERM received. Initiating graceful shutdown.' });
     if (server) server.close(() => process.exit(0));
     else process.exit(0);
 });
