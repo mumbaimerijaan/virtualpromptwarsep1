@@ -34,12 +34,12 @@ window.roleState = {
         }
 
         if (token) {
-            if (role === 'admin' && !currentPath.includes('admin-dashboard')) {
-                 window.location.replace('/pages/admin-dashboard.html');
-            } else if (role !== 'admin' && currentPath.includes('admin')) {
-                 window.location.replace('/pages/user-dashboard.html');
+            if (role === 'admin' && currentPath !== '/admin') {
+                 window.location.replace('/admin');
+            } else if (role !== 'admin' && currentPath === '/admin') {
+                 window.location.replace('/dashboard');
             } else if ((currentPath === '/' || currentPath === '/index.html') && role !== 'admin') {
-                 window.location.replace('/pages/user-dashboard.html');
+                 window.location.replace('/dashboard');
             }
         }
     }

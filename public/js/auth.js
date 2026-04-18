@@ -67,7 +67,7 @@ window.authLogic = {
                 
                 if (res.ok && data.token) {
                     window.roleState.setSession(data.token, data.role);
-                    window.location.replace('/pages/admin-dashboard.html');
+                    window.location.replace('/admin');
                 } else {
                     ui.errorMsg.text(data.error || 'Login failed.').removeClass('hidden');
                 }
@@ -107,9 +107,9 @@ window.authLogic = {
                  const payload = await res.json();
                  
                  if (payload.isNewUser) {
-                      window.location.replace('/pages/onboarding.html');
+                      window.location.replace('/onboarding');
                  } else {
-                      window.location.replace('/pages/user-dashboard.html');
+                      window.location.replace('/dashboard');
                  }
                  
              } catch (error) {

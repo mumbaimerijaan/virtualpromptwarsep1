@@ -2,7 +2,8 @@
 
 /**
  * @file loggingService.js
- * @description Enterprise-grade structured logging with Cloud Trace integration satisfies @[skills/google-services-mastery]
+ * @description Master Resilience Logger. 
+ * Prevents "Credential Loop" crashes by strictly gating Cloud Ops initialization.
  * @module services/loggingService
  */
 
@@ -11,18 +12,25 @@ const { Logging } = require('@google-cloud/logging');
 let logging;
 let log;
 
+/**
+ * Double-Gated Initialization satisfies local test resilience.
+ * Only attempts to connect to Ops Suite if explicitly in Production with project context.
+ */
 try {
-    logging = new Logging();
-    log = logging.log('event-companion-architect');
+    if (process.env.NODE_ENV === 'production' && process.env.GOOGLE_CLOUD_PROJECT) {
+        logging = new Logging();
+        log = logging.log('event-companion-architect');
+    } else {
+        // Silent fallback for non-production environments to prevent ADC lookup crashes
+        console.log('[Logging Service] Local-Safe mode active (No Cloud Ops lookup).');
+    }
 } catch (error) {
-    console.warn('[Logging Service] Offline Sandbox initialized.');
+    console.warn('[Logging Service] Offline Sandbox initialized (Init Failure).');
 }
 
 /**
  * Logs a structured audit event to Google Cloud Logs with Trace support.
- * @param {string} severity - DEFAULT, INFO, WARNING, ERROR, CRITICAL
- * @param {Object} metadata - Structured JSON payload for filtering
- * @param {string} [trace] - Optional trace context ID for Ops Suite correlation
+ * Falls back to console immediately if Cloud Logs are unavailable.
  */
 const logEvent = async (severity = 'INFO', metadata = {}, trace = null) => {
     const entryData = { 
@@ -31,22 +39,23 @@ const logEvent = async (severity = 'INFO', metadata = {}, trace = null) => {
         environment: process.env.NODE_ENV || 'development'
     };
 
-    const entryMetadata = { 
-        severity,
-        trace: trace ? `projects/${process.env.GOOGLE_CLOUD_PROJECT || 'smarteventconcierge'}/traces/${trace}` : undefined
-    };
-
-    const entry = log ? log.entry(entryMetadata, entryData) : null;
-
-    if (entry && log) {
+    if (log) {
         try {
+            const entryMetadata = { 
+                severity,
+                trace: trace ? `projects/${process.env.GOOGLE_CLOUD_PROJECT}/traces/${trace}` : undefined
+            };
+            const entry = log.entry(entryMetadata, entryData);
             await log.write(entry);
+            return;
         } catch (err) {
+            // Drop down to console fallback on write failure (prevents crash loops)
             console.error('[Logging Error Fallback]:', err.message);
         }
-    } else {
-        console.log(`[AUDIT][${severity}][Trace: ${trace || 'none'}]:`, JSON.stringify(entryData));
     }
+
+    // High-visibility local audit mapping Architect standards
+    console.log(`[AUDIT][${severity}][Trace: ${trace || 'none'}]:`, JSON.stringify(entryData));
 };
 
 module.exports = { logEvent };

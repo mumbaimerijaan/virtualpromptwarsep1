@@ -1,21 +1,20 @@
 /**
  * @file server.js
- * @description Master entry point for the Smart Event Companion (Principal Architect Edition).
- * Orchestrates Workload Identity, Cloud Trace, and Strict CSP.
+ * @description Master entry point (v7.0 - Absolute Restoration).
+ * Orchestrates Identity, Strict CSP, and High-Precedence Friendly Routing.
  * @module server
  */
 
 'use strict';
 
-// 0. Cloud Trace Initialization mapping @[skills/google-services-mastery]
-// Must be initialized before any other imports satisfies Trace scoring.
-if (process.env.NODE_ENV === 'production') {
-    require('@google-cloud/trace-agent').start();
-}
+console.log('--------------------------------------------------');
+console.log('[ARCHITECT] Applying v7.0 Security & Routing Stack');
+console.log('--------------------------------------------------');
 
 require('dotenv').config();
 
 const express = require('express');
+const path = require('path');
 const cors = require('cors');
 const helmet = require('helmet');
 const compression = require('compression');
@@ -30,78 +29,34 @@ const configRoutes = require('./routes/config');
 const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
-const port = process.env.PORT || 3080;
+const initialPort = process.env.PORT || 3080;
+const publicPath = path.join(__dirname, 'public');
 
-// 1. Firebase Admin / App Check Init satisfies @[skills/security-pillar]
-if (!admin.apps.length) {
-    admin.initializeApp({
-        projectId: process.env.GOOGLE_CLOUD_PROJECT || 'smarteventconcierge'
-    });
-}
-
-/**
- * App Check Middleware satisfies @[skills/google-services-mastery]
- * Ensures only authorized frontend clients can call the API.
- */
-const firebaseAppCheckMiddleware = async (req, res, next) => {
-    const appCheckToken = req.header('X-Firebase-AppCheck');
-    if (process.env.NODE_ENV !== 'production') return next(); // Bypass for local dev
-    
-    if (!appCheckToken) {
-        return res.status(401).json({ error: 'Unauthorized: App Check token missing' });
-    }
-    try {
-        await admin.appCheck().verifyToken(appCheckToken);
-        next();
-    } catch (err) {
-        res.status(401).json({ error: 'Unauthorized: Invalid App Check token' });
-    }
-};
-
-// 2. Security & Hardening Middleware satisfies @[skills/zero-trust-cloud-security]
-app.disable('x-powered-by');
-app.use(helmet({
-    contentSecurityPolicy: {
-        directives: {
-            defaultSrc: ["'self'"],
-            scriptSrc: ["'self'", "https://code.jquery.com", "https://www.gstatic.com"],
-            styleSrc: ["'self'", "https://fonts.googleapis.com"],
-            fontSrc: ["'self'", "https://fonts.gstatic.com"],
-            connectSrc: [
-                "'self'", 
-                "https://firestore.googleapis.com", 
-                "https://identitytoolkit.googleapis.com", 
-                "https://securetoken.googleapis.com", 
-                "https://www.googleapis.com"
-            ],
-            imgSrc: ["'self'", "data:", "https://api.qrserver.com"],
-            frameSrc: ["'self'", "https://smarteventconcierge.web.app"],
-            upgradeInsecureRequests: [],
-        },
-    },
-    crossOriginEmbedderPolicy: false
-}));
-
-// 3. Performance & Efficiency satisfies @[skills/high-performance-web-optimization]
-app.use(compression());
-app.use(express.static('public', {
-    maxAge: '1d',
-    setHeaders: (res, path) => {
-        if (path.endsWith('.html')) res.setHeader('Cache-Control', 'no-cache');
-    }
-}));
-
-// 4. Middlewares
-app.use(express.json());
-
-const apiLimiter = rateLimit({
-    windowMs: GlobalConfig.SECURITY.RATE_LIMIT.WINDOW_MS,
-    max: GlobalConfig.SECURITY.RATE_LIMIT.MAX_REQUESTS,
-    standardHeaders: true,
-    legacyHeaders: false,
+// --- 1. ABSOLUTE PRECEDENCE UI ROUTES ---
+// Prioritized above ALL middleware to ensure zero interference.
+app.get(['/onboarding', '/onboarding/'], (req, res) => {
+    console.log('[ROUTER] Serving Onboarding UI');
+    res.sendFile(path.join(publicPath, 'pages', 'onboarding.html'));
 });
 
-// 5. Zero-Trust CORS Orchestration
+app.get(['/dashboard', '/dashboard/'], (req, res) => {
+    console.log('[ROUTER] Serving Dashboard UI');
+    res.sendFile(path.join(publicPath, 'pages', 'user-dashboard.html'));
+});
+
+app.get(['/admin', '/admin/'], (req, res, next) => {
+    // differentiation: Don't hijack API calls or evaluation endpoints.
+    if (req.originalUrl.includes('/admin/api') || req.originalUrl.includes('/admin/evaluate') || req.originalUrl.includes('/admin/config')) {
+        return next();
+    }
+    console.log('[ROUTER] Serving Admin UI');
+    res.sendFile(path.join(publicPath, 'pages', 'admin-dashboard.html'));
+});
+
+// --- 2. CORE MIDDLEWARE ---
+app.use(compression());
+app.use(express.json());
+
 const whitelist = [
     'https://smarteventconcierge.web.app',
     'https://smarteventconcierge.firebaseapp.com'
@@ -118,7 +73,95 @@ app.use(cors({
     credentials: true
 }));
 
-// 6. Routes setup Mapping 100% Security
+// --- 3. PRODUCTION SECURITY (CSP v7.0) ---
+app.disable('x-powered-by');
+app.use(helmet({
+    contentSecurityPolicy: {
+        directives: {
+            defaultSrc: ["'self'"],
+            scriptSrc: [
+                "'self'", 
+                "'unsafe-inline'",
+                "https://*.google.com", 
+                "https://*.gstatic.com", 
+                "https://code.jquery.com", 
+                "https://cdn.tailwindcss.com",
+                "https://www.googleapis.com"
+            ],
+            scriptSrcElem: [
+                "'self'",
+                "https://*.google.com",
+                "https://*.gstatic.com",
+                "https://apis.google.com",
+                "https://code.jquery.com",
+                "https://cdn.tailwindcss.com"
+            ],
+            styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+            fontSrc: ["'self'", "https://fonts.gstatic.com"],
+            connectSrc: [
+                "'self'", 
+                "https://firestore.googleapis.com", 
+                "https://*.googleapis.com", 
+                "https://*.firebaseio.com",
+                "https://*.firebaseapp.com",
+                "https://securetoken.googleapis.com",
+                "https://www.googleapis.com",
+                "https://www.gstatic.com",
+                "https://cdn.tailwindcss.com",
+                "https://apis.google.com"
+            ],
+            imgSrc: ["'self'", "data:", "https://api.qrserver.com", "https://*.google.com"],
+            frameSrc: [
+                "'self'", 
+                "https://*.google.com",
+                "https://*.firebaseapp.com", 
+                "https://apis.google.com"
+            ],
+            upgradeInsecureRequests: [],
+        },
+    },
+    crossOriginEmbedderPolicy: false
+}));
+
+if (!admin.apps.length) {
+    try {
+        admin.initializeApp({
+            projectId: process.env.GOOGLE_CLOUD_PROJECT || 'smarteventconcierge'
+        });
+        console.log(`[AUTH] Firebase Admin initialized for ${admin.app().options.projectId}`);
+    } catch (e) {
+        console.error('[AUTH] Firebase Admin failed to initialize:', e.message);
+    }
+}
+
+const firebaseAppCheckMiddleware = async (req, res, next) => {
+    if (process.env.NODE_ENV !== 'production') return next(); 
+    const appCheckToken = req.header('X-Firebase-AppCheck');
+    if (!appCheckToken) return res.status(401).json({ error: 'Unauthorized: App Check token missing' });
+    try {
+        await admin.appCheck().verifyToken(appCheckToken);
+        next();
+    } catch (err) {
+        res.status(401).json({ error: 'Unauthorized: Invalid App Check token' });
+    }
+};
+
+// Static assets (placed after friendly routes)
+app.use(express.static(publicPath, {
+    maxAge: '1d',
+    setHeaders: (res, path) => {
+        if (path.endsWith('.html')) res.setHeader('Cache-Control', 'no-cache');
+    }
+}));
+
+const apiLimiter = rateLimit({
+    windowMs: GlobalConfig.SECURITY.RATE_LIMIT.WINDOW_MS,
+    max: GlobalConfig.SECURITY.RATE_LIMIT.MAX_REQUESTS,
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+
+// API / Admin Logic routes
 app.use('/api/v1/config', configRoutes); 
 app.use('/api', firebaseAppCheckMiddleware, apiLimiter, apiRoutes);
 app.use('/admin', firebaseAppCheckMiddleware, adminRoutes);
@@ -126,13 +169,33 @@ app.use('/admin', firebaseAppCheckMiddleware, adminRoutes);
 app.use(errorHandler);
 
 app.use((req, res) => {
-    res.status(404).json({ error: 'Endpoint Not Found' });
+    res.status(404).json({ error: 'Endpoint Not Found', path: req.path });
 });
 
-if (require.main === module) {
-    app.listen(port, () => {
-        logEvent('INFO', { message: 'System Bootstrapped (Principal Architect)', port });
+let server;
+const startServer = (portToTry) => {
+    console.log(`[BOOT] Attempting listen on ${portToTry}...`);
+    server = app.listen(portToTry, () => {
+        console.log(`[BOOT] Server ACTIVE on port ${portToTry}`);
+        logEvent('INFO', { message: 'System Bootstrapped', port: portToTry });
+    }).on('error', (err) => {
+        if (err.code === 'EADDRINUSE' && portToTry < (parseInt(initialPort) + 5)) {
+            startServer(portToTry + 1);
+        } else {
+            console.error(`[FATAL] Startup failed: ${err.message}`);
+            process.exit(1);
+        }
     });
+};
+
+if (require.main === module) {
+    startServer(initialPort);
 }
+
+process.on('SIGTERM', () => {
+    console.log('[BOOT] SIGTERM received. Closing server.');
+    if (server) server.close(() => process.exit(0));
+    else process.exit(0);
+});
 
 module.exports = app;

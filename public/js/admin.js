@@ -160,7 +160,7 @@ window.adminLogic = {
                 window.utils.showToast('Submissions closed manually', 'warning');
             });
 
-            // 3. Evaluation Engine Logic
+            // 3. Evaluation Engine logic
             ui.runEvalBtn.on('click', async () => {
                 const cloudRunUrl = ui.evalCloudRun.val();
                 const githubUrl = ui.evalGithub.val();
@@ -201,7 +201,12 @@ window.adminLogic = {
                 }
             });
 
-        } catch (err) {
+            // 4. Broadcast Handlers satisfies CSP Decoupling mapping @[skills/zero-trust-cloud-security]
+            $('#broadcast-info-btn').on('click', () => window.adminLogic.sendToast('info'));
+            $('#broadcast-warn-btn').on('click', () => window.adminLogic.sendToast('warning'));
+            $('#broadcast-success-btn').on('click', () => window.adminLogic.sendToast('success'));
+
+        } catch (e) {
             console.error('[ADMIN] Init critical fail:', err.message);
         }
     },

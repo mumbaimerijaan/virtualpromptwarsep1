@@ -20,15 +20,27 @@ $(document).ready(async () => {
         window.roleState.enforceViewBoundary();
     }
 
-    const currentPath = window.location.pathname;
+    const currentPath = window.location.pathname.replace(/\/$/, "") || "/";
+
+    if (currentPath === "/" || currentPath === "/index.html") {
+         if (window.authLogic) await window.authLogic.init();
+    } else if (currentPath === '/onboarding') {
+         if (window.onboardingLogic) window.onboardingLogic.init();
+    } else if (currentPath === '/admin') {
+         if (window.adminLogic) window.adminLogic.init();
+    } else if (currentPath === '/dashboard') {
+         if (window.qrLogic) window.qrLogic.init();
+         if (window.interactionsLogic) window.interactionsLogic.init();
+         if (typeof fetchDashboardProfile === 'function') fetchDashboardProfile();
+    }
 
     if (currentPath === '/' || currentPath === '/index.html') {
          if (window.authLogic) await window.authLogic.init();
-    } else if (currentPath.includes('onboarding.html')) {
+    } else if (currentPath === '/onboarding') {
          if (window.onboardingLogic) window.onboardingLogic.init();
-    } else if (currentPath.includes('admin-dashboard')) {
+    } else if (currentPath === '/admin') {
          if (window.adminLogic) window.adminLogic.init();
-    } else if (currentPath.includes('user-dashboard')) {
+    } else if (currentPath === '/dashboard') {
          if (window.qrLogic) window.qrLogic.init();
          if (window.interactionsLogic) window.interactionsLogic.init();
          if (typeof fetchDashboardProfile === 'function') fetchDashboardProfile();

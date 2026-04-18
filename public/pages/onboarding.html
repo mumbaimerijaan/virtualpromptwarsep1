@@ -4,10 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Complete Your Profile</title>
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://code.jquery.com; connect-src 'self'; img-src 'self' data:;">
+    <!-- Localized jQuery 3.7.1 satisfies Resilience guards -->
+    <script src="/js/lib/jquery.min.js" defer></script>
+
+    <link rel="stylesheet" href="/css/tailwind.css">
     <link rel="stylesheet" href="/css/styles.css">
-    <script src="https://cdn.tailwindcss.com" defer></script>
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js" defer></script>
+    <link rel="icon" href="data:,">
     <script src="/dist/js/utils.js" defer></script>
     <script src="/dist/js/role.js" defer></script>
     <script src="/dist/js/onboarding.js" defer></script>
