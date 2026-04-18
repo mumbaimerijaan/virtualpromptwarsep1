@@ -1,0 +1,13 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+    .glass-pwa {
+        @apply bg-white/30 backdrop-blur-md border border-white/20 shadow-xl;
+    }
+    
+    .selected-tag {
+        @apply ring-4 ring-indigo-400 bg-indigo-50 border-indigo-200 !important;
+    }
+}

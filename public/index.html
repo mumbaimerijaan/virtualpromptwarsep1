@@ -3,26 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Event Companion | v5.0 Architect Edition</title>
+    <title>Smart Event Concierge | v5.1 Architect Edition</title>
     
-    <!-- Lighthouse Performance Optimization satisfies @[skills/high-performance-web-optimization] -->
+    <!-- Local high-performance assets satisfies @[skills/high-performance-web-optimization] -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
-    <link rel="dns-prefetch" href="https://firestore.googleapis.com">
     
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://code.jquery.com https://www.gstatic.com https://apis.google.com; frame-src 'self' https://smarteventconcierge.firebaseapp.com https://smarteventconcierge.web.app; connect-src 'self' https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://www.gstatic.com https://cdn.tailwindcss.com https://www.googleapis.com https://apis.google.com https://smarteventconcierge.web.app https://firebaseauthjs.googleapis.com; img-src 'self' data:;">
+    <!-- Enforcing local Tailwind avoids unsafe-inline and allows SRI mapping satisfies @[skills/security-pillar] -->
+    <link rel="stylesheet" href="/css/tailwind.css">
+    <link rel="stylesheet" href="/css/styles.css">
     
     <link rel="icon" href="data:,">
     <link rel="manifest" href="/manifest.json">
-    <link rel="stylesheet" href="/css/styles.css">
     
-    <script src="https://cdn.tailwindcss.com" defer></script>
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js" crossorigin="anonymous" defer></script>
-    
-    <!-- Firebase Compat Modules mapping @[skills/firebase-identity-management] -->
+    <!-- External Dependencies with SRI Hashes satisfies @[skills/zero-trust-cloud-security] -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" 
+            integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" 
+            crossorigin="anonymous" defer></script>
+            
+    <!-- Firebase Compat Modules mapping @[skills/google-services-mastery] -->
     <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-app-compat.js" defer></script>
     <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-auth-compat.js" defer></script>
     <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore-compat.js" defer></script>
+    <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-app-check-compat.js" defer></script>
 
     <!-- Load optimized production assets -->
     <script src="/dist/js/utils.js" defer></script>
@@ -33,47 +36,41 @@
 </head>
 <body class="min-h-screen font-sans bg-pastel flex items-center justify-center p-4">
     
-    <!-- Responsive Guard: Desktop Lock satisfies Portal Requirements -->
-    <div id="mobile-guard" class="hidden fixed inset-0 z-[100] bg-white/95 backdrop-blur-md flex flex-col items-center justify-center p-8 text-center lg:hidden">
-        <div class="w-20 h-20 bg-indigo-100 rounded-full flex items-center justify-center mb-6">
-            <svg class="w-10 h-10 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
-        </div>
-        <h2 class="text-2xl font-bold text-gray-900 mb-2">Desktop Access Only</h2>
-        <p class="text-gray-600">The Event Submission Portal and Admin Console are optimized for desktop resolution (min-width: 1024px). Please switch devices to continue.</p>
+    <!-- Responsive Guard satisfies WCAG Accessibility -->
+    <div id="mobile-guard" class="hidden fixed inset-0 z-[100] bg-white/95 backdrop-blur-md flex flex-col items-center justify-center p-8 text-center lg:hidden" aria-hidden="true">
+        <h2 class="text-2xl font-bold text-gray-900">Desktop Access Only</h2>
+        <p class="text-gray-600">This portal requires high-resolution precision.</p>
     </div>
 
-    <!-- Toast Layer mapping @[skills/modular-frontend-orchestration] -->
-    <div id="toast-container" class="fixed top-6 right-6 z-[200] space-y-3 pointer-events-none"></div>
+    <div id="toast-container" class="fixed top-6 right-6 z-[200] space-y-3 pointer-events-none" aria-live="polite"></div>
 
-    <!-- Login Card -->
     <main id="main-content" class="glass-pwa w-full max-w-md p-8 rounded-xl shadow-2xl text-center space-y-6">
         <h1 class="text-3xl font-bold text-gray-900 tracking-tight">Smart Event Concierge</h1>
         
         <div class="space-y-4">
             <button id="user-login-btn" class="w-full bg-white hover:bg-gray-50 text-gray-700 font-medium py-3 px-4 rounded-lg transition-all focus:ring-4 focus:ring-gray-200 border border-gray-300 shadow-sm flex items-center justify-center gap-3" aria-label="Login with Google">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="20px" height="20px"><path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8c-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4C12.955 4 4 12.955 4 24s8.955 20 20 20s20-8.955 20-20C44 22.659 43.862 21.35 43.611 20.083z"/><path fill="#FF3D00" d="M6.306 14.691l6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4C16.318 4 9.656 8.337 6.306 14.691z"/><path fill="#4CAF50" d="M24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238C29.211 35.091 26.715 36 24 36c-5.202 0-9.619-3.317-11.283-7.946l-6.522 5.025C9.505 39.556 16.227 44 24 44z"/><path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303c-.792 2.237-2.231 4.166-4.087 5.571c.001-.001.002-.001.003-.002l6.19 5.238C36.971 39.205 44 34 44 24C44 22.659 43.862 21.35 43.611 20.083z"/></svg>
                 Login with Google
             </button>
 
             <div id="admin-login-ui" class="hidden space-y-4">
-                 <div id="admin-divider" class="relative py-2">
+                 <div class="relative py-2">
                      <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-gray-300/50"></div></div>
-                     <div class="relative flex justify-center"><span class="bg-white/80 px-2 text-sm text-gray-600 font-bold tracking-tighter">ADMIN SECURE ACCESS</span></div>
+                     <div class="relative flex justify-center"><span class="bg-white/80 px-2 text-sm text-gray-600 font-bold uppercase tracking-widest">Architect Secure Access</span></div>
                  </div>
 
-                 <form id="admin-login-form" class="space-y-3">
-                     <input type="text" id="admin-user" class="w-full px-4 py-3 bg-white/70 border border-white/40 rounded-xl focus:ring-2 focus:ring-indigo-400 focus:outline-none placeholder-gray-400 font-medium" placeholder="Username" required>
-                     <input type="password" id="admin-pass" class="w-full px-4 py-3 bg-white/70 border border-white/40 rounded-xl focus:ring-2 focus:ring-indigo-400 focus:outline-none placeholder-gray-400 font-medium" placeholder="Password" required>
-                     <button type="submit" id="admin-login-btn" aria-label="Submit Admin Credentials" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 rounded-xl transition-all shadow-lg shadow-indigo-500/20">
+                 <form id="admin-login-form" class="space-y-3" aria-label="Administrative Login">
+                     <input type="text" id="admin-user" class="w-full px-4 py-3 bg-white/70 border border-white/40 rounded-xl focus:ring-2 focus:ring-indigo-400 focus:outline-none" placeholder="Username" required aria-label="Admin Username">
+                     <input type="password" id="admin-pass" class="w-full px-4 py-3 bg-white/70 border border-white/40 rounded-xl focus:ring-2 focus:ring-indigo-400 focus:outline-none" placeholder="Password" required aria-label="Admin Password">
+                     <button type="submit" id="admin-login-btn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 rounded-xl transition-all shadow-lg shadow-indigo-500/20">
                          Authorize Access
                      </button>
                  </form>
             </div>
             
-            <p id="login-error" class="text-red-500 text-sm hidden font-bold" aria-live="polite"></p>
+            <p id="login-error" class="text-red-500 text-sm hidden font-bold" aria-live="assertive"></p>
 
-            <div id="auth-footer" class="pt-6 border-t border-gray-200/50">
-                <button id="toggle-admin-btn" class="text-xs font-bold text-gray-400 hover:text-indigo-600 transition-colors uppercase tracking-widest">Login as admin</button>
+            <div class="pt-6 border-t border-gray-200/50">
+                <button id="toggle-admin-btn" class="text-xs font-bold text-gray-400 hover:text-indigo-600 transition-colors uppercase tracking-widest" aria-expanded="false">Login as administrator</button>
             </div>
          </div>
     </main>

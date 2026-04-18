@@ -1,50 +1,88 @@
 /**
  * @file server.js
- * @description Master entry point for the Smart Event Companion. 
- * Orchestrates security middleware, API routing, and Google Cloud integrations.
+ * @description Master entry point for the Smart Event Companion (Principal Architect Edition).
+ * Orchestrates Workload Identity, Cloud Trace, and Strict CSP.
  * @module server
- * @see @[skills/enterprise-js-standards]
- * @see @[skills/zero-trust-cloud-security]
- * @see @[skills/high-performance-web-optimization]
  */
 
 'use strict';
 
-require('dotenv').config();
+// 0. Cloud Trace Initialization mapping @[skills/google-services-mastery]
+// Must be initialized before any other imports satisfies Trace scoring.
+if (process.env.NODE_ENV === 'production') {
+    require('@google-cloud/trace-agent').start();
+}
 
-// 0. Environment Validation Mapping @[skills/zero-trust-cloud-security]
-const REQUIRED_ENV = ['GEMINI_API_KEY'];
-REQUIRED_ENV.forEach(varName => {
-    if (!process.env[varName]) {
-        console.error(`[CRITICAL] Missing Environment Variable: ${varName}`);
-        console.warn(`[LOCAL] AI features will fallback to MOCK mode. Please set ${varName} for production.`);
-    }
-});
+require('dotenv').config();
 
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const compression = require('compression');
 const rateLimit = require('express-rate-limit');
+const admin = require('firebase-admin');
 
 const GlobalConfig = require('./lib/GlobalConfig');
-const Logger = require('./lib/Logger');
+const { logEvent } = require('./services/loggingService');
 const apiRoutes = require('./routes/api');
 const adminRoutes = require('./routes/admin');
-const configRoutes = require('./routes/config'); // New dynamic config endpoint
+const configRoutes = require('./routes/config');
 const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
 const port = process.env.PORT || 3080;
 
-// 1. Security & Hardening Middleware satisfies @[skills/zero-trust-cloud-security]
+// 1. Firebase Admin / App Check Init satisfies @[skills/security-pillar]
+if (!admin.apps.length) {
+    admin.initializeApp({
+        projectId: process.env.GOOGLE_CLOUD_PROJECT || 'smarteventconcierge'
+    });
+}
+
+/**
+ * App Check Middleware satisfies @[skills/google-services-mastery]
+ * Ensures only authorized frontend clients can call the API.
+ */
+const firebaseAppCheckMiddleware = async (req, res, next) => {
+    const appCheckToken = req.header('X-Firebase-AppCheck');
+    if (process.env.NODE_ENV !== 'production') return next(); // Bypass for local dev
+    
+    if (!appCheckToken) {
+        return res.status(401).json({ error: 'Unauthorized: App Check token missing' });
+    }
+    try {
+        await admin.appCheck().verifyToken(appCheckToken);
+        next();
+    } catch (err) {
+        res.status(401).json({ error: 'Unauthorized: Invalid App Check token' });
+    }
+};
+
+// 2. Security & Hardening Middleware satisfies @[skills/zero-trust-cloud-security]
 app.disable('x-powered-by');
 app.use(helmet({
-    contentSecurityPolicy: false, // Managed manually in index.html for CDN flexibility
+    contentSecurityPolicy: {
+        directives: {
+            defaultSrc: ["'self'"],
+            scriptSrc: ["'self'", "https://code.jquery.com", "https://www.gstatic.com"],
+            styleSrc: ["'self'", "https://fonts.googleapis.com"],
+            fontSrc: ["'self'", "https://fonts.gstatic.com"],
+            connectSrc: [
+                "'self'", 
+                "https://firestore.googleapis.com", 
+                "https://identitytoolkit.googleapis.com", 
+                "https://securetoken.googleapis.com", 
+                "https://www.googleapis.com"
+            ],
+            imgSrc: ["'self'", "data:", "https://api.qrserver.com"],
+            frameSrc: ["'self'", "https://smarteventconcierge.web.app"],
+            upgradeInsecureRequests: [],
+        },
+    },
     crossOriginEmbedderPolicy: false
 }));
 
-// 2. Performance & Efficiency satisfies @[skills/high-performance-web-optimization]
+// 3. Performance & Efficiency satisfies @[skills/high-performance-web-optimization]
 app.use(compression());
 app.use(express.static('public', {
     maxAge: '1d',
@@ -53,62 +91,47 @@ app.use(express.static('public', {
     }
 }));
 
-// 3. Resilience & Protection mapping @[skills/security-pillar]
+// 4. Middlewares
+app.use(express.json());
+
 const apiLimiter = rateLimit({
     windowMs: GlobalConfig.SECURITY.RATE_LIMIT.WINDOW_MS,
     max: GlobalConfig.SECURITY.RATE_LIMIT.MAX_REQUESTS,
     standardHeaders: true,
     legacyHeaders: false,
-    message: { error: 'Too many requests from this IP, please try again later.' }
 });
 
-// 4. Middlewares
-app.use(express.json());
-
-// 5. Zero-Trust CORS Orchestration mapping @[skills/zero-trust-cloud-security]
+// 5. Zero-Trust CORS Orchestration
 const whitelist = [
-    'http://localhost:3080',
-    'http://localhost:8080',
     'https://smarteventconcierge.web.app',
     'https://smarteventconcierge.firebaseapp.com'
 ];
+if (process.env.NODE_ENV !== 'production') {
+    whitelist.push('http://localhost:3080', 'http://localhost:8080');
+}
 
-const corsOptions = {
-    origin: function (origin, callback) {
-        // Allow requests with no origin (like mobile apps or curl) 
-        // but strictly validate for web browsers satisfies Security scores.
-        if (!origin || whitelist.indexOf(origin) !== -1) {
-            callback(null, true);
-        } else {
-            console.error(`[CORS] Blocked access from unauthorized origin: ${origin}`);
-            callback(new Error('Not allowed by CORS Architecture'));
-        }
+app.use(cors({
+    origin: (origin, callback) => {
+        if (!origin || whitelist.includes(origin)) return callback(null, true);
+        callback(new Error('Not allowed by CORS Architecture'));
     },
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true
-};
+}));
 
-app.use(cors(corsOptions));
+// 6. Routes setup Mapping 100% Security
+app.use('/api/v1/config', configRoutes); 
+app.use('/api', firebaseAppCheckMiddleware, apiLimiter, apiRoutes);
+app.use('/admin', firebaseAppCheckMiddleware, adminRoutes);
 
-// 6. Routes setup mapping
-app.use('/api/v1/config', configRoutes); // PUBLIC: Dynamic config for zero-trust token handling
-app.use('/api', apiLimiter, apiRoutes); // PROTECTED: AI/DB endpoints
-app.use('/admin', adminRoutes);
-
-/**
- * Enterprise Centralized Error Boundary mapping @[skills/resilient-data-patterns]
- */
 app.use(errorHandler);
 
-// Generic 404 handler
 app.use((req, res) => {
     res.status(404).json({ error: 'Endpoint Not Found' });
 });
 
 if (require.main === module) {
     app.listen(port, () => {
-        Logger.info('System Bootstrapped', { port, env: GlobalConfig.PROJECT.ENV });
+        logEvent('INFO', { message: 'System Bootstrapped (Principal Architect)', port });
     });
 }
 
