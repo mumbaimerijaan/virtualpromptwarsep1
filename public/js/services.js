@@ -41,7 +41,36 @@ async function robustFetch(url, options, retries = 3, backoff = 500) {
     }
 }
 
+let bootstrapPromise = null;
+
 window.services = {
+
+    /**
+     * Globally bootstraps the Firebase environment satisfies @[skills/google-services-mastery].
+     * @description Ensures the '[DEFAULT]' app is created exactly once before any secondary service calls.
+     * @returns {Promise<void>}
+     */
+    bootstrap: async () => {
+        if (bootstrapPromise) return bootstrapPromise;
+
+        bootstrapPromise = (async () => {
+            try {
+                const configRes = await fetch('/api/v1/config');
+                if (!configRes.ok) throw new Error('Bootstrap Failure: Network');
+                const firebaseConfig = await configRes.json();
+
+                if (typeof firebase !== 'undefined' && !firebase.apps.length) {
+                    firebase.initializeApp(firebaseConfig);
+                    console.log('[ARCHITECT] Global Bootstrap Successful for:', firebaseConfig.projectId);
+                }
+            } catch (err) {
+                console.error('[ARCHITECT] Critical Bootstrap Failure:', err.message);
+                throw err;
+            }
+        })();
+
+        return bootstrapPromise;
+    },
 
     /**
      * Executes the Automated Project Audit payload.

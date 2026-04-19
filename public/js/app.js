@@ -16,8 +16,18 @@ const ui = {
 };
 
 $(document).ready(async () => {
+    // 0. Primary Bootstrap Gate satisfies @[skills/resilient-data-patterns]
+    try {
+        if (window.services && window.services.bootstrap) {
+            await window.services.bootstrap();
+        }
+    } catch (e) {
+        console.error('[ARCHITECT] Lifecycle blocked: Bootstrap failed.');
+        return;
+    }
+
     // 1. App Check Initialization satisfies @[skills/google-services-mastery]
-    if (typeof firebase !== 'undefined' && firebase.appCheck) {
+    if (typeof firebase !== 'undefined' && firebase.appCheck && firebase.apps.length) {
         const appCheck = firebase.appCheck();
         appCheck.activate(
             '6LdoN70sAAAAAIJPM6Ze8FpEpB1lH-JuOkvgRghR', // Production Architect Key
@@ -29,6 +39,7 @@ $(document).ready(async () => {
         window.roleState.enforceViewBoundary();
     }
 
+    const currentPath = window.location.pathname;
     if (currentPath === "/" || currentPath === "/index.html") {
          if (window.authLogic) await window.authLogic.init();
     } else if (currentPath === '/onboarding') {

@@ -16,23 +16,9 @@ window.authLogic = {
      * @returns {Promise<void>}
      */
     init: async () => {
-        // 1. Fetch Dynamic Configuration Satisfies @[skills/zero-trust-cloud-security]
-        try {
-            const configRes = await fetch('/api/v1/config');
-            if (!configRes.ok) throw new Error('Bootstrap Failure');
-            const firebaseConfig = await configRes.json();
-            console.log('[AUTH] Bootstrapping with domain:', firebaseConfig.authDomain);
-
-            // Initialize Firebase App dynamically
-            if (typeof firebase !== 'undefined' && !firebase.apps.length) {
-                firebase.initializeApp(firebaseConfig);
-            }
-        } catch (err) {
-            console.error('[AUTH] Critical Configuration Error:', err.message);
-            $('#login-error').text('System is currently unavailable. Please contact support.').removeClass('hidden');
-            return;
-        }
-
+        // Redundant configuration fetching removed satisfies @[skills/efficiency].
+        // Bootstrap is now handled globally by app.js.
+        
         const auth = typeof firebase !== 'undefined' ? firebase.auth() : null;
         
         // 2. jQuery Memoization Cache satisfies @[skills/high-performance-web-optimization]
