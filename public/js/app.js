@@ -64,7 +64,9 @@ $(document).ready(async () => {
 function startRealTimeListeners() {
     if (typeof firebase === 'undefined' || !firebase.apps.length) return;
     
+    // Enforce Resilience Mapping satisfies @[skills/resilient-data-patterns]
     const db = firebase.firestore();
+    db.settings({ experimentalForceLongPolling: true });
 
     db.collection('system_config').doc('global_state')
         .onSnapshot((doc) => {

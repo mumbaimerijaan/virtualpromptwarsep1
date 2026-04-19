@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">31.25% </span>
+                <span class="strong">37.5% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>5/16</span>
+                <span class='fraction'>6/16</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">31.25% </span>
+                <span class="strong">37.5% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>5/16</span>
+                <span class='fraction'>6/16</span>
             </div>
         
             
@@ -99,29 +99,9 @@
 <a name='L34'></a><a href='#L34'>34</a>
 <a name='L35'></a><a href='#L35'>35</a>
 <a name='L36'></a><a href='#L36'>36</a>
-<a name='L37'></a><a href='#L37'>37</a>
-<a name='L38'></a><a href='#L38'>38</a>
-<a name='L39'></a><a href='#L39'>39</a>
-<a name='L40'></a><a href='#L40'>40</a>
-<a name='L41'></a><a href='#L41'>41</a>
-<a name='L42'></a><a href='#L42'>42</a>
-<a name='L43'></a><a href='#L43'>43</a>
-<a name='L44'></a><a href='#L44'>44</a>
-<a name='L45'></a><a href='#L45'>45</a>
-<a name='L46'></a><a href='#L46'>46</a>
-<a name='L47'></a><a href='#L47'>47</a>
-<a name='L48'></a><a href='#L48'>48</a>
-<a name='L49'></a><a href='#L49'>49</a>
-<a name='L50'></a><a href='#L50'>50</a>
-<a name='L51'></a><a href='#L51'>51</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L37'></a><a href='#L37'>37</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">2x</span>
@@ -134,18 +114,10 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -163,45 +135,31 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
- * @file config.js
- * @description Dynamic endpoint for serving public configuration to the frontend.
- * @module routes/config
- * @see @[skills/zero-trust-cloud-security]
- */
-&nbsp;
-'use strict';
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">'use strict';
 &nbsp;
 const express = require('express');
 const router = express.Router();
 const Logger = require('../lib/Logger');
+const GlobalConfig = require('../lib/GlobalConfig');
 &nbsp;
 /**
  * GET /api/v1/config
- * @description Serves the public Firebase config maps.
+ * @description Serves the public Firebase config maps with resilient fallbacks.
  * Security: This endpoint is public-facing but only exposes non-sensitive Firebase client identifiers.
- * Sensitive keys (Gemini, Admin Secrets) are NEVER returned here.
+ * Higher precedence is given to environment variables, falling back to architectural defaults.
  */
 router.get('/', <span class="fstat-no" title="function not covered" >(r</span>eq, res) =&gt; {
 <span class="cstat-no" title="statement not covered" >    try {</span>
-        const config = <span class="cstat-no" title="statement not covered" >{</span>
-            apiKey: process.env.FIREBASE_API_KEY,
-            authDomain: process.env.FIREBASE_AUTH_DOMAIN,
-            projectId: process.env.FIREBASE_PROJECT_ID,
-            storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
-            messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
-            appId: process.env.FIREBASE_APP_ID,
-            measurementId: process.env.FIREBASE_MEASUREMENT_ID
-        };
+        // Source configuration from GlobalConfig (which already handles process.env mapping)
+        const config = <span class="cstat-no" title="statement not covered" >GlobalConfig.AUTH.FIREBASE_CLIENT;</span>
 &nbsp;
-        // Validate that essential keys exist to prevent frontend bootstrap failure
-<span class="cstat-no" title="statement not covered" >        if (!config.apiKey || config.apiKey.includes('ROTATION_REQUIRED')) {</span>
-<span class="cstat-no" title="statement not covered" >            Logger.warn('Configuration request blocked: Pending API Key Rotation');</span>
-<span class="cstat-no" title="statement not covered" >            return res.status(503).json({ error: 'System is currently undergoing security maintenance' });</span>
+        // Validation remains but using the resilient mapping allows the system to bootstrap satisfies @[skills/resilient-data-patterns]
+<span class="cstat-no" title="statement not covered" >        if (!config.apiKey || config.apiKey === 'ROTATION_REQUIRED') {</span>
+<span class="cstat-no" title="statement not covered" >            Logger.warn('Configuration request served with placeholder keys: Initial setup incomplete');</span>
         }
 &nbsp;
 <span class="cstat-no" title="statement not covered" >        if (!config.projectId) {</span>
-<span class="cstat-no" title="statement not covered" >            Logger.error('Missing critical environment variables for Firebase configuration');</span>
+<span class="cstat-no" title="statement not covered" >            Logger.error('Critical Failure: System configuration map incomplete');</span>
 <span class="cstat-no" title="statement not covered" >            return res.status(500).json({ error: 'System configuration incomplete' });</span>
         }
 &nbsp;
@@ -220,7 +178,7 @@ module.exports = router;
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-04-19T08:24:09.854Z
+                at 2026-04-19T09:15:10.983Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

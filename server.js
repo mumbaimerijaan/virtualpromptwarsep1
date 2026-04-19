@@ -110,6 +110,7 @@ app.use(helmet({
                 "https://*.googleapis.com", 
                 "https://*.firebaseio.com",
                 "https://*.firebaseapp.com",
+                "https://*.firebasestorage.googleapis.com",
                 "https://securetoken.googleapis.com",
                 "https://www.googleapis.com",
                 "https://www.gstatic.com",
