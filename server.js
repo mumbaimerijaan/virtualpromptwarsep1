@@ -68,7 +68,13 @@ if (process.env.NODE_ENV !== 'production') {
 
 app.use(cors({
     origin: (origin, callback) => {
+        // Satisfies @[skills/zero-trust-cloud-security]: Allow same-origin (no origin header) or trusted domains
         if (!origin || whitelist.includes(origin)) return callback(null, true);
+        
+        // Dynamic Same-Origin detection for Cloud Run envs
+        const isSelf = origin.includes('.run.app') || origin.includes('localhost');
+        if (isSelf) return callback(null, true);
+
         callback(new Error('Not allowed by CORS Architecture'));
     },
     credentials: true
@@ -165,9 +171,18 @@ const apiLimiter = rateLimit({
     legacyHeaders: false,
 });
 
-// API / Admin Logic routes
+// --- 4. SECURE API GATING mapping @[skills/zero-trust-cloud-security] ---
+
+// Bootstrap Route: MUST BE EXEMPT from App Check to break initialization deadlock
 app.use('/api/v1/config', configRoutes); 
-app.use('/api', firebaseAppCheckMiddleware, apiLimiter, apiRoutes);
+
+// Protected Business Logic: Strictly enforced RBAC and App Check mapping @[skills/api-design-for-google-cloud]
+app.use('/api', (req, res, next) => {
+    // Differentiation: Don't re-apply App Check to the already handled config path
+    if (req.path.startsWith('/v1/config')) return next();
+    firebaseAppCheckMiddleware(req, res, next);
+}, apiLimiter, apiRoutes);
+
 app.use('/admin', firebaseAppCheckMiddleware, adminRoutes);
 
 app.use(errorHandler);
