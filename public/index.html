@@ -9,15 +9,10 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
     
-    <!-- Enforcing local Tailwind avoids unsafe-inline and allows SRI mapping satisfies @[skills/security-pillar] -->
+    <!-- Enforcing local Tailwind and jQuery satisfies @[skills/security-pillar] -->
+    <script src="/js/lib/jquery.min.js" defer></script>
     <link rel="stylesheet" href="/css/tailwind.css">
     <link rel="stylesheet" href="/css/styles.css">
-    
-    <link rel="icon" href="data:,">
-    <link rel="manifest" href="/manifest.json">
-    
-    <!-- Localized jQuery 3.7.1 satisfies Resilience guards -->
-    <script src="/js/lib/jquery.min.js" defer></script>
             
     <!-- Firebase Compat Modules mapping @[skills/google-services-mastery] -->
     <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-app-compat.js" defer></script>

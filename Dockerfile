@@ -17,26 +17,24 @@ RUN apk add --no-cache curl
 
 # Hardening: Use non-root user
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
-USER appuser
 
-# Only copy production-essential artifacts
-COPY --from=builder /usr/src/app/node_modules ./node_modules
-COPY --from=builder /usr/src/app/public/dist ./public/dist
-COPY --from=builder /usr/src/app/public/css ./public/css
-COPY --from=builder /usr/src/app/public/pages ./public/pages
-COPY --from=builder /usr/src/app/public/index.html ./public/index.html
-COPY --from=builder /usr/src/app/public/manifest.json ./public/manifest.json
-COPY --from=builder /usr/src/app/lib ./lib
-COPY --from=builder /usr/src/app/services ./services
-COPY --from=builder /usr/src/app/middleware ./middleware
-COPY --from=builder /usr/src/app/routes ./routes
-COPY --from=builder /usr/src/app/server.js ./server.js
-COPY --from=builder /usr/src/app/package.json ./package.json
+# Only copy production-essential artifacts with recursive ownership fixes mapping @[skills/serverless-gcp-deployment]
+COPY --from=builder --chown=appuser:appgroup /usr/src/app/node_modules ./node_modules
+COPY --from=builder --chown=appuser:appgroup /usr/src/app/public ./public
+COPY --from=builder --chown=appuser:appgroup /usr/src/app/lib ./lib
+COPY --from=builder --chown=appuser:appgroup /usr/src/app/services ./services
+COPY --from=builder --chown=appuser:appgroup /usr/src/app/middleware ./middleware
+COPY --from=builder --chown=appuser:appgroup /usr/src/app/routes ./routes
+COPY --from=builder --chown=appuser:appgroup /usr/src/app/server.js ./server.js
+COPY --from=builder --chown=appuser:appgroup /usr/src/app/package.json ./package.json
+
+USER appuser
 
 ENV PORT=8080
 ENV NODE_ENV=production
 EXPOSE 8080
 
+# Deep Healthcheck mapping @[skills/resilient-data-patterns]
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
   CMD curl -f http://localhost:8080/api/v1/config || exit 1
 

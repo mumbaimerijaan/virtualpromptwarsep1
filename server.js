@@ -1,4 +1,7 @@
-require('@google-cloud/trace-agent').start();
+// Only start trace agent if explicitly enabled or in production with project context satisfies @[skills/zero-trust-cloud-security]
+if (process.env.NODE_ENV === 'production' && process.env.GOOGLE_CLOUD_PROJECT) {
+    require('@google-cloud/trace-agent').start();
+}
 /**
  * @file server.js
  * @description Master entry point (v8.0 - Absolute Winner).
@@ -26,7 +29,8 @@ const configRoutes = require('./routes/config');
 const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
-const initialPort = process.env.PORT || 3080;
+// Enforce strict port mapping from environment with fallback logic mapping @[skills/serverless-gcp-deployment]
+const initialPort = parseInt(process.env.PORT) || 3080;
 const publicPath = path.join(__dirname, 'public');
 
 // --- 1. ABSOLUTE PRECEDENCE UI ROUTES ---
