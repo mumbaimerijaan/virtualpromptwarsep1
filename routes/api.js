@@ -10,9 +10,17 @@
 
 const express = require('express');
 const router = express.Router();
-const { verifyFirebaseToken } = require('../middleware/verifyFirebaseToken');
+const { verifyFirebaseToken, admin } = require('../middleware/verifyFirebaseToken');
 const { generateInsights } = require('../services/aiService');
-const { saveInteraction, syncUser, updateUserProfile, getUserProfile, getLeaderboard } = require('../services/firestoreService');
+const { 
+    saveInteraction, 
+    syncUser, 
+    updateUserProfile, 
+    getUserProfile, 
+    getLeaderboard,
+    updateProcessingStatus 
+} = require('../services/firestoreService');
+const { logEvent } = require('../services/loggingService');
 
 // Require authentication for all API pathways
 router.use(verifyFirebaseToken);
@@ -81,9 +89,16 @@ router.post('/v1/generate-insights', async (req, res, next) => {
             return res.status(400).json({ error: 'Input notes are required.' });
         }
 
-        // Isolate AI mapping
+        await updateProcessingStatus(userId, 'Analyzing interactions...');
         const insights = await generateInsights(notes);
 
+        // Explicit Contract Enforcement @[skills/api-design-for-google-cloud]
+        if (!insights || !insights.summary || !Array.isArray(insights.actions)) {
+            throw new Error('Architectural Breach: AI response failed schema expectations.');
+        }
+
+        await updateProcessingStatus(userId, 'Persisting insights...');
+        
         // Form unique ID for Firestore
         const interactionId = `int_${Date.now()}_${Math.floor(Math.random()*1000)}`;
         
@@ -97,6 +112,7 @@ router.post('/v1/generate-insights', async (req, res, next) => {
              actions: insights.actions
         });
 
+        await updateProcessingStatus(userId, 'Insights ready.');
         res.json(insights);
 
     } catch (error) {
@@ -109,6 +125,11 @@ router.post('/v1/generate-insights', async (req, res, next) => {
  */
 router.post('/v1/submit-project', async (req, res, next) => {
     try {
+        // Role Boundary Check satisfies @[skills/zero-trust-cloud-security]
+        if (req.user.role !== 'admin' && req.user.role !== 'attendee') {
+            return res.status(403).json({ error: 'RBAC Breach: Invalid Role' });
+        }
+
         const { cloudRunUrl, githubUrl } = req.body;
         const uid = req.user.uid;
 
@@ -124,17 +145,27 @@ router.post('/v1/submit-project', async (req, res, next) => {
         }
 
         // 2. Execute Hybrid Audit Engine @[skills/ai-orchestration]
+        await updateProcessingStatus(uid, 'Initiating Cloud Run service audit...');
         const { performHybridEvaluation } = require('../services/evalService');
         const results = await performHybridEvaluation(cloudRunUrl, githubUrl);
 
+        // Explicit Contract Enforcement
+        if (!results || typeof results.score !== 'number' || !results.pillars) {
+            throw new Error('Architectural Breach: evaluation engine returned corrupted payload.');
+        }
+
+        await updateProcessingStatus(uid, 'Verifying source code efficiency...');
+
         // 3. Persist results for both Attendee history and Admin monitor
-        const admin = require('../middleware/verifyFirebaseToken').admin;
         const db = admin.firestore();
+
+        await updateProcessingStatus(uid, 'Finalizing audit reports...');
 
         const timestamp = admin.firestore.FieldValue.serverTimestamp();
         
         // A. Public Evaluation (Admin Table)
-        await db.collection('evaluations').add({
+        const evalRef = db.collection('evaluations').doc();
+        await evalRef.set({
             uid,
             cloudRunUrl,
             githubUrl,
@@ -145,7 +176,8 @@ router.post('/v1/submit-project', async (req, res, next) => {
         });
 
         // B. Private Interaction (User Feed)
-        await db.collection('interactions').add({
+        const interactionRef = db.collection('interactions').doc();
+        await interactionRef.set({
             userId: uid,
             type: 'PROJECT_SUBMISSION',
             summary: `Project Audited: ${results.score}/100 Score`,
@@ -153,6 +185,7 @@ router.post('/v1/submit-project', async (req, res, next) => {
             timestamp
         });
 
+        await updateProcessingStatus(uid, 'Audit complete. Result synchronized.');
         res.json(results);
 
     } catch (error) {

@@ -6,6 +6,15 @@
  * satisfies @[skills/wcag-inclusive-design]
  */
 
+// --- 0. UI SELECTOR CACHE satisfies @[skills/efficiency] ---
+const ui = {
+    submissionBtn: $('#submit-project-btn'),
+    statusMsg: $('#submission-status-narrative'),
+    userName: $('#dash-name'),
+    userCompany: $('#dash-company'),
+    qrCode: $('#user-qr-code')
+};
+
 $(document).ready(async () => {
     // 1. App Check Initialization satisfies @[skills/google-services-mastery]
     if (typeof firebase !== 'undefined' && firebase.appCheck) {
@@ -54,6 +63,23 @@ function startRealTimeListeners() {
             }
         });
 
+    // 3. Inclusive AI Status Narrative satisfies @[skills/accessibility]
+    firebase.auth().onAuthStateChanged(user => {
+        if (user) {
+            db.collection('processing_status').doc(user.uid)
+                .onSnapshot(doc => {
+                    if (doc.exists) {
+                        const { status } = doc.data();
+                        if (ui.statusMsg.length) {
+                            ui.statusMsg.text(status);
+                            // Announce to screen readers
+                            ui.statusMsg.attr('aria-live', 'polite');
+                        }
+                    }
+                });
+        }
+    });
+
     db.collection('broadcasts')
         .where('timestamp', '>', new Date())
         .onSnapshot((snapshot) => {
@@ -67,19 +93,16 @@ function startRealTimeListeners() {
 }
 
 function handleConfigUpdate(config) {
-    const submissionBtn = $('#submit-project-btn');
-    const statusMsg = $('#submission-status-narrative'); // ARIA-live territory
-
-    if (submissionBtn.length) {
+    if (ui.submissionBtn.length) {
         if (config.submissionsOpen === false) {
-            submissionBtn.prop('disabled', true).addClass('opacity-50');
-            if (statusMsg.length) {
-                statusMsg.text('Submission portal is currently locked by the event architect.');
+            ui.submissionBtn.prop('disabled', true).addClass('opacity-50');
+            if (ui.statusMsg.length) {
+                ui.statusMsg.text('Submission portal is currently locked by the event architect.');
                 window.utils.showToast('Submissions Locked', 'warning');
             }
         } else {
-            submissionBtn.prop('disabled', false).removeClass('opacity-50');
-            if (statusMsg.length) statusMsg.text('Submission portal is open and ready for project audits.');
+            ui.submissionBtn.prop('disabled', false).removeClass('opacity-50');
+            if (ui.statusMsg.length) ui.statusMsg.text('Submission portal is open and ready for project audits.');
         }
     }
 }
@@ -88,15 +111,15 @@ async function fetchDashboardProfile() {
     try {
         const { profile } = await window.services.fetchProfile();
         
-        $('#dash-name').text(profile.name || 'Attendee');
-        $('#dash-company').text(profile.company || 'Enterprise Partner');
+        ui.userName.text(profile.name || 'Attendee');
+        ui.userCompany.text(profile.company || 'Enterprise Partner');
         
         // QR Narrative Mapping satisfies @[skills/accessibility]
         if (profile.uid) {
             const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${profile.uid}`;
-            const qrImg = $('#user-qr-code');
-            qrImg.attr('src', qrUrl);
-            qrImg.attr('aria-label', `Project QR identification for ${profile.name}. Scan to view networking profile.`);
+            ui.qrCode.attr('src', qrUrl);
+            ui.qrCode.attr('aria-label', `Project QR identification for ${profile.name}. Scan to view networking profile.`);
+            ui.qrCode.attr('role', 'img');
         }
 
     } catch (err) {

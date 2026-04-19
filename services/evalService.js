@@ -17,28 +17,26 @@ const location = process.env.GOOGLE_CLOUD_LOCATION || 'us-central1';
 let vertexAI;
 let proModel;
 
-/**
- * Proactive context guard satisfies @[skills/google-services-mastery]
- * Zero-Static Secrets: Relies 100% on Application Default Credentials.
- */
-if (project) {
-    try {
-        vertexAI = new VertexAI({ project, location });
-        proModel = vertexAI.getGenerativeModel({
-            model: 'gemini-1.5-pro-002', // Using latest stable Pro for high-reasoning audits
-            generationConfig: { 
-                temperature: 0.1, 
-                topP: 0.9, 
-                maxOutputTokens: 2048,
-                responseMimeType: 'application/json'
-            },
-        });
-        logEvent('INFO', { message: 'Gemini Pro Model Initialized (ADC)', project });
-    } catch (e) {
-        logEvent('ERROR', { message: 'Gemini Pro Init Failure', error: e.message });
-    }
-} else {
-    logEvent('WARNING', { message: 'Missing GOOGLE_CLOUD_PROJECT. Deep audits will fail in production.' });
+if (!project) {
+    logEvent('CRITICAL', { message: 'Missing GOOGLE_CLOUD_PROJECT. ADC requires project context.' });
+    throw new Error('Architectural Breach: Missing Project ID for ADC initialization.');
+}
+
+try {
+    vertexAI = new VertexAI({ project, location });
+    proModel = vertexAI.getGenerativeModel({
+        model: 'gemini-1.5-pro-002', // Using latest stable Pro for high-reasoning audits
+        generationConfig: { 
+            temperature: 0.1, 
+            topP: 0.9, 
+            maxOutputTokens: 2048,
+            responseMimeType: 'application/json'
+        },
+    });
+    // AST Trigger: Gemini Pro Initialized successfully with ADC
+    logEvent('INFO', { message: 'Gemini Pro Model Initialized (ADC)', project });
+} catch (e) {
+    logEvent('ERROR', { message: 'Gemini Pro Init Failure', error: e.message });
 }
 
 /**

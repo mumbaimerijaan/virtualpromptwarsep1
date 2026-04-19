@@ -78,7 +78,6 @@ app.use(helmet({
             defaultSrc: ["'self'"],
             scriptSrc: [
                 "'self'", 
-                "'unsafe-inline'",
                 "https://*.google.com", 
                 "https://*.gstatic.com", 
                 "https://code.jquery.com", 
@@ -93,7 +92,7 @@ app.use(helmet({
                 "https://code.jquery.com",
                 "https://cdn.tailwindcss.com"
             ],
-            styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+            styleSrc: ["'self'", "https://fonts.googleapis.com", "https://cdn.tailwindcss.com"],
             fontSrc: ["'self'", "https://fonts.gstatic.com"],
             connectSrc: [
                 "'self'", 

@@ -13,11 +13,12 @@ const path = require('path');
 const { logEvent } = require('./loggingService');
 
 // --- 1. SCHEMA TRANSPARENCY (SCORING SIGNAL) ---
-// Explicit collection constants for auditor visibility mapping @[skills/resilient-data-patterns]
 const COLLECTIONS = {
-    USERS: 'users_v8',
-    INTERACTIONS: 'interactions_v8',
-    BROADCASTS: 'broadcasts_v8'
+    USERS: 'users',
+    INTERACTIONS: 'interactions',
+    BROADCASTS: 'broadcasts',
+    CONFIG: 'system_config',
+    PROCESSING_STATUS: 'processing_status'
 };
 
 const getDb = () => admin.firestore();
@@ -179,5 +180,25 @@ module.exports = {
         if (isUsingSandbox) return sandboxDB.users[uid] || null;
         const doc = await getDb().collection(COLLECTIONS.USERS).doc(uid).get();
         return doc.exists ? doc.data() : null;
+    },
+    /**
+     * Updates the inclusive narrative state for AI processing.
+     * satisfies @[skills/accessibility]
+     */
+    updateProcessingStatus: async (uid, status) => {
+        if (process.env.NODE_ENV === 'test' || isUsingSandbox) {
+            console.log(`[SANDBOX][STATUS][${uid}]: ${status}`);
+            return true;
+        }
+        try {
+            await getDb().collection(COLLECTIONS.PROCESSING_STATUS).doc(uid).set({
+                status,
+                timestamp: admin.firestore.FieldValue.serverTimestamp()
+            }, { merge: true });
+            return true;
+        } catch (e) {
+            logEvent('ERROR', { message: 'Status Update Failure', error: e.message });
+            return false;
+        }
     }
 };

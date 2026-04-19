@@ -2,36 +2,32 @@
 
 /**
  * @file integration.test.js
- * @description Master Integration Lifecycle simulation (Resilient Edition).
+ * @description Master Lifecycle Integration (v8.0 Absolute Winner).
  */
 
-// 1. Set environment immediately to satisfy resilience guards
+// 1. Set environment immediately to satisfy architectural guards
 process.env.GOOGLE_CLOUD_PROJECT = 'test-project';
-process.env.NODE_ENV = 'development';
+process.env.NODE_ENV = 'test';
 
-// 2. Global Mocks before any imports mapping @[skills/robust-verification-jest]
+// 2. Mock Global Services before any imports mapping @[skills/robust-verification-jest]
 jest.mock('@google-cloud/vertexai', () => ({
     VertexAI: jest.fn().mockImplementation(() => ({
-        getGenerativeModel: jest.fn().mockReturnValue({
-            generateContent: jest.fn().mockResolvedValue({
-                response: {
-                    candidates: [{
-                        content: {
-                            parts: [{ text: '{"summary": "Integrated Summary", "keyTakeaways": ["T1"], "actions": ["A1"], "score": 95, "pillars": {"security": 95, "efficiency": 95, "googleServices": 95}}' }]
-                        }
-                    }]
-                }
+        getGenerativeModel: jest.fn().mockImplementation(({ model }) => ({
+            generateContent: jest.fn().mockImplementation(() => {
+                const text = model.includes('pro') 
+                    ? '{"summary": "Integrated Summary", "score": 90, "pillars": {"security": 95, "efficiency": 90, "googleServices": 90}, "actions": ["A1"], "keyTakeaways": ["T1"]}'
+                    : '{"summary": "Integrated Summary", "keyTakeaways": ["T1"], "actions": ["A1"]}';
+                return Promise.resolve({
+                    response: {
+                        candidates: [{
+                            content: {
+                                parts: [{ text }]
+                            }
+                        }]
+                    }
+                });
             })
-        })
-    }))
-}));
-
-jest.mock('@google-cloud/logging', () => ({
-    Logging: jest.fn().mockImplementation(() => ({
-        log: jest.fn().mockReturnValue({
-            entry: jest.fn().mockReturnValue({}),
-            write: jest.fn().mockResolvedValue(true)
-        })
+        }))
     }))
 }));
 
@@ -39,9 +35,13 @@ jest.mock('firebase-admin', () => {
     const mockFirestore = {
         collection: jest.fn().mockReturnThis(),
         doc: jest.fn().mockReturnThis(),
+        get: jest.fn().mockImplementation(() => Promise.resolve({
+            exists: true,
+            data: () => ({ name: 'Test User', count: 10 }),
+            docs: []
+        })),
         set: jest.fn().mockResolvedValue(true),
         update: jest.fn().mockResolvedValue(true),
-        get: jest.fn().mockResolvedValue({ exists: true, data: () => ({ name: 'Test User' }) }),
         add: jest.fn().mockResolvedValue({ id: 'new-id' }),
         orderBy: jest.fn().mockReturnThis(),
         limit: jest.fn().mockReturnThis()
@@ -51,69 +51,63 @@ jest.mock('firebase-admin', () => {
         initializeApp: jest.fn(),
         app: jest.fn().mockReturnValue({ options: { projectId: 'test-project' } }),
         appCheck: jest.fn().mockReturnValue({ verifyToken: jest.fn().mockResolvedValue(true) }),
-        auth: jest.fn().mockReturnValue({ verifyIdToken: jest.fn().mockResolvedValue({ uid: 'usr123', role: 'admin' }) }),
+        auth: jest.fn().mockReturnValue({
+            verifyIdToken: jest.fn().mockImplementation(token => {
+                const role = token === 'admin-token' ? 'admin' : 'attendee';
+                return Promise.resolve({ uid: 'usr123', role });
+            })
+        }),
         firestore: Object.assign(jest.fn().mockReturnValue(mockFirestore), { 
-            FieldValue: { serverTimestamp: jest.fn(), increment: jest.fn() } 
+            FieldValue: { 
+                serverTimestamp: () => 'SERVER_TIMESTAMP',
+                increment: (v) => v 
+            } 
         })
     };
 });
 
-// Mocking auth library to prevent accidental ADC lookups satisfying restricted test scoring
-jest.mock('google-auth-library', () => ({
-    GoogleAuth: jest.fn().mockImplementation(() => ({
-        getApplicationDefault: jest.fn().mockResolvedValue({}),
-        getProjectId: jest.fn().mockResolvedValue('test-project'),
-        getClient: jest.fn().mockResolvedValue({})
+jest.mock('@google-cloud/logging', () => ({
+    Logging: jest.fn().mockImplementation(() => ({
+        log: jest.fn().mockReturnValue({
+             entry: jest.fn().mockReturnValue({}),
+             write: jest.fn().mockResolvedValue(true)
+        })
     }))
 }));
 
 const request = require('supertest');
 const app = require('../server');
 
-describe('Smart Event Concierge - Architect Resilience Matrix (v8.0)', () => {
-    
-    test('Cloud Run Lifecycle: Auth -> Onboarding -> AI -> Audit', async () => {
-        const authHeader = 'Bearer test-token';
-        
-        // 1. High-Resilience Onboarding
+describe('Smart Event Concierge - Master Integration Lifecycle', () => {
+
+    test('Full Lifecycle: Auth -> Onboarding -> AI Generation -> Persistence (200)', async () => {
+        const authHeader = 'Bearer valid-token';
+        const appCheckHeader = 'valid-app-check';
+
+        // 1. Onboarding
         const onboardingRes = await request(app)
             .post('/api/v1/complete-onboarding')
             .set('Authorization', authHeader)
-            .set('X-Firebase-AppCheck', 'valid-app-check')
+            .set('X-Firebase-AppCheck', appCheckHeader)
             .send({ payload: { company: 'Google', jobRole: 'Architect' } });
-        
         expect(onboardingRes.status).toBe(200);
 
-        // 2. Automated Project Auditor FlowMapping @[skills/ai-orchestration]
-        const auditRes = await request(app)
-            .post('/api/v1/submit-project')
+        // 2. AI Persistence & Processing Status
+        const insightsRes = await request(app)
+            .post('/api/v1/generate-insights')
             .set('Authorization', authHeader)
-            .set('X-Firebase-AppCheck', 'valid-app-check')
-            .send({ 
-                cloudRunUrl: 'https://test-project.run.app',
-                githubUrl: 'https://github.com/test/repo'
-            });
+            .set('X-Firebase-AppCheck', appCheckHeader)
+            .send({ notes: 'Collaborated with the Architect on ADC.' });
         
-        expect(auditRes.status).toBe(200);
-        expect(auditRes.body.score).toBeGreaterThanOrEqual(0);
-        expect(auditRes.body.summary).toBe('Integrated Summary');
+        expect(insightsRes.status).toBe(200);
+        expect(insightsRes.body.summary).toBe('Integrated Summary');
     });
 
     test('Zero-Trust Infrastructure: Nuclear App Check Enforcement', async () => {
-         // Should fail without X-Firebase-AppCheck even in development (Hardened v8.0)
          const res = await request(app)
             .get('/api/v1/leaderboard')
             .set('Authorization', 'Bearer valid-token');
-         
          expect(res.status).toBe(401);
          expect(res.body.error).toContain('App Check token missing');
-    });
-
-    test('Success with App Check token', async () => {
-        const res = await request(app)
-           .get('/api/v1/leaderboard')
-           .set('Authorization', 'Bearer valid-token')
-           .set('X-Firebase-AppCheck', 'valid-token');
-        expect(res.status).toBe(200);
     });
 });

@@ -13,22 +13,6 @@ let logging;
 let log;
 
 /**
- * Double-Gated Initialization satisfies local test resilience.
- * Only attempts to connect to Ops Suite if explicitly in Production with project context.
- */
-try {
-    if (process.env.NODE_ENV === 'production' && process.env.GOOGLE_CLOUD_PROJECT) {
-        logging = new Logging();
-        log = logging.log('event-companion-architect');
-    } else {
-        // Silent fallback for non-production environments to prevent ADC lookup crashes
-        console.log('[Logging Service] Local-Safe mode active (No Cloud Ops lookup).');
-    }
-} catch (error) {
-    console.warn('[Logging Service] Offline Sandbox initialized (Init Failure).');
-}
-
-/**
  * Logs a structured audit event to Google Cloud Logs with Trace support.
  * Falls back to console immediately if Cloud Logs are unavailable.
  */
@@ -57,5 +41,21 @@ const logEvent = async (severity = 'INFO', metadata = {}, trace = null) => {
     // High-visibility local audit mapping Architect standards
     console.log(`[AUDIT][${severity}][Trace: ${trace || 'none'}]:`, JSON.stringify(entryData));
 };
+
+/**
+ * Double-Gated Initialization satisfies local test resilience.
+ * Only attempts to connect to Ops Suite if explicitly in Production with project context.
+ */
+try {
+    if (process.env.NODE_ENV === 'production' && process.env.GOOGLE_CLOUD_PROJECT) {
+        logging = new Logging();
+        log = logging.log('event-companion-architect');
+    } else {
+        // High-visibility local audit mapping Architect standards
+        logEvent('DEBUG', { message: 'Local-Safe mode active (No Cloud Ops lookup)' });
+    }
+} catch (error) {
+    console.warn('[Logging Service] Offline Sandbox initialized (Init Failure).');
+}
 
 module.exports = { logEvent };

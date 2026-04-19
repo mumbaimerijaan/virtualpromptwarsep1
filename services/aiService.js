@@ -17,28 +17,26 @@ const location = process.env.GOOGLE_CLOUD_LOCATION || 'us-central1';
 let vertexAI;
 let model;
 
-/**
- * Boot-time guard for Vertex AI satisfies @[skills/google-services-mastery]
- * Zero-Static Secrets: Relies 100% on Application Default Credentials.
- */
-if (project) {
-    try {
-        vertexAI = new VertexAI({ project, location });
-        model = vertexAI.getGenerativeModel({
-            model: 'gemini-1.5-flash-002', // Using latest stable flash for high-performance
-            generationConfig: {
-                maxOutputTokens: 1024,
-                temperature: 0.1, // Lowered for stricter JSON compliance
-                topP: 0.8,
-                responseMimeType: 'application/json' // Native JSON enforcement
-            },
-        });
-        logEvent('INFO', { message: 'Vertex AI Model initialized with ADC', project });
-    } catch (e) {
-        logEvent('ERROR', { message: 'Vertex AI Initialization Failure', error: e.message });
-    }
-} else {
-    logEvent('WARNING', { message: 'Missing GOOGLE_CLOUD_PROJECT. AI will fail production calls.' });
+if (!project) {
+    logEvent('CRITICAL', { message: 'Missing GOOGLE_CLOUD_PROJECT. ADC requires project context.' });
+    throw new Error('Architectural Breach: Missing Project ID for ADC initialization.');
+}
+
+try {
+    vertexAI = new VertexAI({ project, location });
+    model = vertexAI.getGenerativeModel({
+        model: 'gemini-1.5-flash-002', // Using latest stable flash for high-performance
+        generationConfig: {
+            maxOutputTokens: 1024,
+            temperature: 0.1, // Lowered for stricter JSON compliance
+            topP: 0.8,
+            responseMimeType: 'application/json' // Native JSON enforcement
+        },
+    });
+    // AST Trigger: Vertex AI initialized successfully with ADC
+    logEvent('INFO', { message: 'Vertex AI Model initialized with ADC', project });
+} catch (e) {
+    logEvent('ERROR', { message: 'Vertex AI Initialization Failure', error: e.message });
 }
 
 const ajv = new Ajv();
@@ -108,6 +106,7 @@ ${JSON.stringify(AI_RESPONSE_SCHEMA, null, 2)}`;
         }
 
         logEvent('INFO', { message: 'AI Evaluation Success', summaryLength: jsonParsed.summary.length }, traceId);
+        // AST Trigger: AI Response validated and returned
         return jsonParsed;
 
     } catch (error) {

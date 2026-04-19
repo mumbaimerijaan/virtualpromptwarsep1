@@ -14,6 +14,8 @@ const Logger = require('../lib/Logger');
 /**
  * GET /api/v1/config
  * @description Serves the public Firebase config maps.
+ * Security: This endpoint is public-facing but only exposes non-sensitive Firebase client identifiers.
+ * Sensitive keys (Gemini, Admin Secrets) are NEVER returned here.
  */
 router.get('/', (req, res) => {
     try {
@@ -28,7 +30,12 @@ router.get('/', (req, res) => {
         };
 
         // Validate that essential keys exist to prevent frontend bootstrap failure
-        if (!config.apiKey || !config.projectId) {
+        if (!config.apiKey || config.apiKey.includes('ROTATION_REQUIRED')) {
+            Logger.warn('Configuration request blocked: Pending API Key Rotation');
+            return res.status(503).json({ error: 'System is currently undergoing security maintenance' });
+        }
+
+        if (!config.projectId) {
             Logger.error('Missing critical environment variables for Firebase configuration');
             return res.status(500).json({ error: 'System configuration incomplete' });
         }
