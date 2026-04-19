@@ -92,7 +92,9 @@ app.use(helmet({
                 "https://*.gstatic.com", 
                 "https://code.jquery.com", 
                 "https://cdn.tailwindcss.com",
-                "https://www.googleapis.com"
+                "https://www.googleapis.com",
+                "https://www.google.com/recaptcha/",
+                "https://www.gstatic.com/recaptcha/"
             ],
             scriptSrcElem: [
                 "'self'",
@@ -100,7 +102,9 @@ app.use(helmet({
                 "https://*.gstatic.com",
                 "https://apis.google.com",
                 "https://code.jquery.com",
-                "https://cdn.tailwindcss.com"
+                "https://cdn.tailwindcss.com",
+                "https://www.google.com/recaptcha/",
+                "https://www.gstatic.com/recaptcha/"
             ],
             styleSrc: ["'self'", "https://fonts.googleapis.com", "https://cdn.tailwindcss.com"],
             fontSrc: ["'self'", "https://fonts.gstatic.com"],
@@ -115,14 +119,17 @@ app.use(helmet({
                 "https://www.googleapis.com",
                 "https://www.gstatic.com",
                 "https://cdn.tailwindcss.com",
-                "https://apis.google.com"
+                "https://apis.google.com",
+                "https://www.google.com/recaptcha/"
             ],
             imgSrc: ["'self'", "data:", "https://api.qrserver.com", "https://*.google.com"],
             frameSrc: [
                 "'self'", 
                 "https://*.google.com",
                 "https://*.firebaseapp.com", 
-                "https://apis.google.com"
+                "https://apis.google.com",
+                "https://www.google.com/recaptcha/",
+                "https://recaptcha.google.com/"
             ],
             upgradeInsecureRequests: [],
         },
