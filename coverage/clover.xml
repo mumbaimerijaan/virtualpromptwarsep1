@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1776668916648" clover="3.2.0">
-  <project timestamp="1776668916648" name="All files">
-    <metrics statements="620" coveredstatements="272" conditionals="348" coveredconditionals="103" methods="72" coveredmethods="20" elements="1040" coveredelements="395" complexity="0" loc="620" ncloc="620" packages="6" files="15" classes="15"/>
+<coverage generated="1776669597215" clover="3.2.0">
+  <project timestamp="1776669597215" name="All files">
+    <metrics statements="622" coveredstatements="278" conditionals="350" coveredconditionals="106" methods="73" coveredmethods="24" elements="1045" coveredelements="408" complexity="0" loc="622" ncloc="622" packages="6" files="15" classes="15"/>
     <package name="ep1">
-      <metrics statements="88" coveredstatements="59" conditionals="46" coveredconditionals="16" methods="13" coveredmethods="3"/>
+      <metrics statements="90" coveredstatements="61" conditionals="48" coveredconditionals="17" methods="14" coveredmethods="4"/>
       <file name="server.js" path="C:\Sachin\Projects\BuildWithAI\virtualPromptWars\ep1\server.js">
-        <metrics statements="88" coveredstatements="59" conditionals="46" coveredconditionals="16" methods="13" coveredmethods="3"/>
+        <metrics statements="90" coveredstatements="61" conditionals="48" coveredconditionals="17" methods="14" coveredmethods="4"/>
         <line num="2" count="2" type="cond" truecount="2" falsecount="2"/>
         <line num="3" count="0" type="stmt"/>
         <line num="12" count="2" type="stmt"/>
@@ -56,44 +56,46 @@
         <line num="155" count="2" type="stmt"/>
         <line num="157" count="0" type="stmt"/>
         <line num="164" count="2" type="stmt"/>
-        <line num="167" count="7" type="cond" truecount="2" falsecount="0"/>
-        <line num="168" count="7" type="cond" truecount="2" falsecount="2"/>
-        <line num="169" count="0" type="stmt"/>
-        <line num="172" count="7" type="stmt"/>
-        <line num="173" count="7" type="cond" truecount="2" falsecount="0"/>
+        <line num="166" count="7" type="cond" truecount="2" falsecount="0"/>
+        <line num="167" count="7" type="cond" truecount="2" falsecount="2"/>
+        <line num="168" count="0" type="stmt"/>
+        <line num="171" count="7" type="stmt"/>
+        <line num="172" count="7" type="cond" truecount="2" falsecount="0"/>
         <line num="174" count="2" type="stmt"/>
         <line num="175" count="2" type="stmt"/>
         <line num="177" count="5" type="stmt"/>
         <line num="178" count="5" type="stmt"/>
         <line num="179" count="5" type="stmt"/>
         <line num="181" count="0" type="stmt"/>
-        <line num="182" count="0" type="stmt"/>
-        <line num="187" count="2" type="stmt"/>
-        <line num="190" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="194" count="2" type="stmt"/>
-        <line num="204" count="2" type="stmt"/>
-        <line num="207" count="2" type="stmt"/>
-        <line num="209" count="6" type="cond" truecount="1" falsecount="1"/>
-        <line num="210" count="6" type="stmt"/>
-        <line num="213" count="2" type="stmt"/>
-        <line num="215" count="2" type="stmt"/>
-        <line num="217" count="2" type="stmt"/>
-        <line num="218" count="0" type="stmt"/>
+        <line num="183" count="0" type="stmt"/>
+        <line num="188" count="2" type="stmt"/>
+        <line num="191" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="195" count="2" type="stmt"/>
+        <line num="205" count="2" type="stmt"/>
+        <line num="208" count="2" type="stmt"/>
+        <line num="210" count="6" type="cond" truecount="1" falsecount="1"/>
+        <line num="211" count="6" type="stmt"/>
+        <line num="214" count="2" type="stmt"/>
+        <line num="216" count="1" type="cond" truecount="1" falsecount="1"/>
+        <line num="217" count="1" type="stmt"/>
+        <line num="220" count="2" type="stmt"/>
         <line num="222" count="2" type="stmt"/>
         <line num="223" count="0" type="stmt"/>
-        <line num="224" count="0" type="stmt"/>
-        <line num="225" count="0" type="stmt"/>
-        <line num="227" count="0" type="cond" truecount="0" falsecount="4"/>
+        <line num="227" count="2" type="stmt"/>
         <line num="228" count="0" type="stmt"/>
+        <line num="229" count="0" type="stmt"/>
         <line num="230" count="0" type="stmt"/>
-        <line num="231" count="0" type="stmt"/>
-        <line num="236" count="2" type="cond" truecount="1" falsecount="1"/>
-        <line num="237" count="0" type="stmt"/>
-        <line num="240" count="2" type="stmt"/>
-        <line num="241" count="0" type="stmt"/>
-        <line num="242" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="243" count="0" type="stmt"/>
-        <line num="246" count="2" type="stmt"/>
+        <line num="232" count="0" type="cond" truecount="0" falsecount="4"/>
+        <line num="233" count="0" type="stmt"/>
+        <line num="235" count="0" type="stmt"/>
+        <line num="236" count="0" type="stmt"/>
+        <line num="241" count="2" type="cond" truecount="1" falsecount="1"/>
+        <line num="242" count="0" type="stmt"/>
+        <line num="245" count="2" type="stmt"/>
+        <line num="246" count="0" type="stmt"/>
+        <line num="247" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="248" count="0" type="stmt"/>
+        <line num="251" count="2" type="stmt"/>
       </file>
     </package>
     <package name="ep1.lib">
@@ -158,18 +160,18 @@
         <line num="27" count="2" type="stmt"/>
         <line num="28" count="2" type="stmt"/>
         <line num="46" count="2" type="stmt"/>
-        <line num="47" count="5" type="stmt"/>
-        <line num="48" count="5" type="cond" truecount="3" falsecount="1"/>
+        <line num="47" count="7" type="stmt"/>
+        <line num="48" count="7" type="cond" truecount="3" falsecount="1"/>
         <line num="49" count="0" type="stmt"/>
         <line num="50" count="0" type="stmt"/>
-        <line num="53" count="5" type="stmt"/>
-        <line num="56" count="5" type="cond" truecount="3" falsecount="1"/>
+        <line num="53" count="7" type="stmt"/>
+        <line num="56" count="7" type="cond" truecount="3" falsecount="1"/>
         <line num="57" count="0" type="stmt"/>
         <line num="58" count="0" type="stmt"/>
-        <line num="61" count="5" type="stmt"/>
-        <line num="64" count="5" type="stmt"/>
-        <line num="65" count="5" type="stmt"/>
-        <line num="66" count="5" type="stmt"/>
+        <line num="61" count="7" type="stmt"/>
+        <line num="64" count="7" type="stmt"/>
+        <line num="65" count="7" type="stmt"/>
+        <line num="66" count="7" type="stmt"/>
         <line num="69" count="0" type="stmt"/>
         <line num="70" count="0" type="stmt"/>
         <line num="71" count="0" type="cond" truecount="0" falsecount="2"/>
@@ -230,7 +232,7 @@
       </file>
     </package>
     <package name="ep1.routes">
-      <metrics statements="150" coveredstatements="62" conditionals="46" coveredconditionals="8" methods="14" coveredmethods="3"/>
+      <metrics statements="150" coveredstatements="65" conditionals="46" coveredconditionals="8" methods="14" coveredmethods="4"/>
       <file name="admin.js" path="C:\Sachin\Projects\BuildWithAI\virtualPromptWars\ep1\routes\admin.js">
         <metrics statements="48" coveredstatements="18" conditionals="10" coveredconditionals="0" methods="5" coveredmethods="0"/>
         <line num="10" count="2" type="stmt"/>
@@ -283,7 +285,7 @@
         <line num="119" count="2" type="stmt"/>
       </file>
       <file name="api.js" path="C:\Sachin\Projects\BuildWithAI\virtualPromptWars\ep1\routes\api.js">
-        <metrics statements="86" coveredstatements="38" conditionals="30" coveredconditionals="8" methods="8" coveredmethods="3"/>
+        <metrics statements="86" coveredstatements="41" conditionals="30" coveredconditionals="8" methods="8" coveredmethods="4"/>
         <line num="11" count="2" type="stmt"/>
         <line num="12" count="2" type="stmt"/>
         <line num="13" count="2" type="stmt"/>
@@ -300,9 +302,9 @@
         <line num="45" count="2" type="stmt"/>
         <line num="46" count="0" type="cond" truecount="0" falsecount="2"/>
         <line num="52" count="2" type="stmt"/>
-        <line num="53" count="0" type="stmt"/>
-        <line num="54" count="0" type="stmt"/>
-        <line num="55" count="0" type="stmt"/>
+        <line num="53" count="2" type="stmt"/>
+        <line num="54" count="2" type="stmt"/>
+        <line num="55" count="2" type="stmt"/>
         <line num="57" count="0" type="stmt"/>
         <line num="64" count="2" type="stmt"/>
         <line num="65" count="1" type="stmt"/>
@@ -392,7 +394,7 @@
       </file>
     </package>
     <package name="ep1.services">
-      <metrics statements="276" coveredstatements="100" conditionals="152" coveredconditionals="37" methods="30" coveredmethods="7"/>
+      <metrics statements="276" coveredstatements="101" conditionals="152" coveredconditionals="39" methods="30" coveredmethods="9"/>
       <file name="aiService.js" path="C:\Sachin\Projects\BuildWithAI\virtualPromptWars\ep1\services\aiService.js">
         <metrics statements="42" coveredstatements="32" conditionals="24" coveredconditionals="16" methods="1" coveredmethods="1"/>
         <line num="10" count="2" type="stmt"/>
@@ -542,7 +544,7 @@
         <line num="100" count="2" type="stmt"/>
       </file>
       <file name="firestoreService.js" path="C:\Sachin\Projects\BuildWithAI\virtualPromptWars\ep1\services\firestoreService.js">
-        <metrics statements="119" coveredstatements="36" conditionals="70" coveredconditionals="12" methods="17" coveredmethods="5"/>
+        <metrics statements="119" coveredstatements="37" conditionals="70" coveredconditionals="14" methods="17" coveredmethods="7"/>
         <line num="10" count="2" type="stmt"/>
         <line num="11" count="2" type="stmt"/>
         <line num="12" count="2" type="stmt"/>
@@ -638,7 +640,7 @@
         <line num="187" count="2" type="stmt"/>
         <line num="192" count="0" type="stmt"/>
         <line num="194" count="0" type="stmt"/>
-        <line num="197" count="0" type="cond" truecount="0" falsecount="4"/>
+        <line num="197" count="2" type="cond" truecount="2" falsecount="2"/>
         <line num="198" count="0" type="stmt"/>
         <line num="199" count="0" type="stmt"/>
         <line num="200" count="0" type="stmt"/>
