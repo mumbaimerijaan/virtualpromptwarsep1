@@ -77,9 +77,9 @@ window.services = {
                     firebase.initializeApp(firebaseConfig);
                     
                     // Enforce Global Resilience Mapping satisfies @[skills/resilient-data-patterns]
-                    // This must be set before any collection/document references are created.
+                    // Force long-polling to bypass WebSocket timeouts in restricted environments.
                     const db = firebase.firestore();
-                    db.settings({ experimentalAutoDetectLongPolling: true, merge: true });
+                    db.settings({ experimentalForceLongPolling: true });
                     
                     console.log('[ARCHITECT] Global Bootstrap Successful for:', firebaseConfig.projectId);
                 }

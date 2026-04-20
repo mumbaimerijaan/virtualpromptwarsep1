@@ -25,7 +25,7 @@ window.interactionsLogic = {
             attachmentName: $('#attachment-name'),
             removeAttachment: $('#remove-attachment'),
             historyContainer: $('#notes-history-container'),
-            notesList: $('#notes-list'),
+            notesList: $('#quick-notes-ledger'),
             exportBtn: $('#export-pdf-btn'),
             
             // Modal Elements
@@ -128,32 +128,32 @@ window.interactionsLogic = {
         };
 
         const renderHistory = () => {
-            ui.notesList.find('tr:not(#empty-ledger-row)').remove();
+            ui.notesList.empty();
             
             if (notesHistory.length === 0) {
-                $('#empty-ledger-row').show();
+                // Empty state handled by default in CSS or simple message
+                ui.notesList.append('<p class="text-xs text-slate-400 italic text-center py-4">No insights captured yet.</p>');
                 ui.exportBtn.addClass('hidden');
                 return;
             }
 
-            $('#empty-ledger-row').hide();
             ui.exportBtn.removeClass('hidden');
 
             notesHistory.forEach((note) => {
                 const date = window.utils.formatDate(note.timestamp);
                 ui.notesList.append(`
-                    <tr class="hover:bg-white/60 cursor-pointer transition-colors group" data-id="${note.id}">
-                        <td class="px-6 py-4 text-[10px] font-bold text-gray-400 tabular-nums">${date}</td>
-                        <td class="px-6 py-4 font-medium text-gray-700 truncate max-w-xs">${note.summary}</td>
-                        <td class="px-6 py-4 text-right">
-                            <button class="text-[10px] btn-pill-cyan px-3 py-1 font-black uppercase tracking-widest transition-all">View</button>
-                        </td>
-                    </tr>
+                    <div class="glass-pwa p-4 rounded-2xl cursor-pointer hover:bg-white/60 transition-all border border-white/40 group" data-id="${note.id}">
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="text-[9px] font-black text-indigo-400 uppercase tracking-widest">${date}</span>
+                            <span class="text-[9px] bg-cyan-100 text-cyan-600 px-2 py-0.5 rounded-full font-black opacity-0 group-hover:opacity-100 transition-opacity">AI BRIEF</span>
+                        </div>
+                        <p class="text-xs font-bold text-gray-700 leading-tight line-clamp-2">${note.summary}</p>
+                    </div>
                 `);
             });
 
             // Bind click handlers mapping @[skills/modular-frontend-orchestration]
-            ui.notesList.find('tr').on('click', function() {
+            ui.notesList.find('[data-id]').on('click', function() {
                 const id = $(this).data('id');
                 const note = notesHistory.find(n => n.id === id);
                 showNoteModal(note);
