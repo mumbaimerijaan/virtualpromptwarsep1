@@ -125,7 +125,7 @@ namespace.utils = {
         } catch (e) {
             return 'N/A';
         }
-    }
+    },
     /**
      * Show a persistent, non-dismissible system alert for critical configuration errors.
      * satisfies @[skills/resilient-data-patterns]
