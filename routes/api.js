@@ -77,8 +77,21 @@ router.post('/v1/sync-user', async (req, res, next) => {
  */
 router.get('/v1/profile', async (req, res, next) => {
     try {
-        const profile = await getUserProfile(req.user.uid);
-        if (!profile) return res.status(404).json({ error: 'Profile not found' });
+        let profile = await getUserProfile(req.user.uid);
+        
+        // --- SELF-HEALING PROVISIONING mapping @[skills/resilient-data-patterns] ---
+        // If profile is missing (race condition or first login), auto-provision a shell
+        if (!profile) {
+            logEvent('INFO', { message: 'Profile auto-provisioning triggered', uid: req.user.uid });
+            await syncUser({ 
+                uid: req.user.uid, 
+                name: req.user.name || 'Event Participant', 
+                email: req.user.email || '' 
+            });
+            profile = await getUserProfile(req.user.uid);
+        }
+
+        if (!profile) return res.status(404).json({ error: 'Profile provision failed' });
         res.json({ success: true, profile });
     } catch (error) {
         next(error);
