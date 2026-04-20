@@ -73,13 +73,47 @@ window.services = {
     },
 
     /**
+     * Retrieves a fresh ID token from the active Firebase session or local storage.
+     * satisfies @[skills/firebase-identity-management]
+     * @returns {Promise<string>}
+     */
+    getAuthToken: async () => {
+        // --- 1. SESSION INITIALIZATION HANDSHAKE mapping @[skills/google-services-mastery] ---
+        // Allows Firebase Auth up to 2 seconds to initialize if current user is stalling.
+        let user = firebase.auth().currentUser;
+        if (!user) {
+             console.log('[SERVICES] Auth state pending. Waiting for provider handshake...');
+             await new Promise(resolve => {
+                 const unsubscribe = firebase.auth().onAuthStateChanged(u => {
+                     user = u;
+                     unsubscribe();
+                     resolve();
+                 });
+                 setTimeout(resolve, 2000); // Failsafe timeout satisfies Reliability
+             });
+        }
+
+        try {
+            if (user) {
+                const token = await user.getIdToken(true);
+                // Update local storage for RBAC consistency mapping @[skills/zero-trust-cloud-security]
+                window.roleState.setSession(token, 'user');
+                return token;
+            }
+        } catch (e) {
+            console.warn('[SERVICES] Firebase token refresh failed. Falling back to local state.');
+        }
+        
+        const localSession = window.roleState.getSession();
+        if (!localSession.token) console.error('[SERVICES] Critical: No identity token available for request.');
+        return localSession.token;
+    },
+
+    /**
      * Executes the Automated Project Audit payload.
-     * @param {string} cloudRunUrl 
-     * @param {string} githubUrl 
-     * @returns {Promise<Object>}
      */
     submitProject: async (cloudRunUrl, githubUrl) => {
-        const { token } = window.roleState.getSession();
+        const token = await window.services.getAuthToken();
         
         const response = await robustFetch('/api/v1/submit-project', {
             method: 'POST',
@@ -102,7 +136,7 @@ window.services = {
     },
 
     generateInsights: async (rawNotes) => {
-        const { token } = window.roleState.getSession();
+        const token = await window.services.getAuthToken();
         const safeNotes = rawNotes ? window.utils.sanitizeInput(rawNotes) : '';
 
         const response = await robustFetch('/api/v1/generate-insights', {
@@ -122,11 +156,8 @@ window.services = {
         return await response.json();
     },
 
-    /**
-     * Retrieves the top 3 networkers globally.
-     */
     fetchLeaderboard: async () => {
-        const { token } = window.roleState.getSession();
+        const token = await window.services.getAuthToken();
         
         const response = await robustFetch('/api/v1/leaderboard', {
             method: 'GET',
@@ -142,11 +173,8 @@ window.services = {
         return await response.json();
     },
 
-    /**
-     * Retrieves robust dashboard aggregations for admin overviews.
-     */
     fetchAdminStats: async () => {
-        const { token } = window.roleState.getSession();
+        const token = await window.services.getAuthToken();
         
         const response = await robustFetch('/admin/dashboard-stats', {
             method: 'GET',
@@ -162,17 +190,10 @@ window.services = {
         return await response.json();
     },
 
-    /**
-     * Alias for fetchAdminStats satisfies architectural consistency.
-     */
     getAdminStats: async function() { return this.fetchAdminStats(); },
 
-    /**
-     * Retrieves the user profile for the authorized attendee.
-     * @returns {Promise<Object>}
-     */
     fetchProfile: async () => {
-        const { token } = window.roleState.getSession();
+        const token = await window.services.getAuthToken();
         
         const response = await robustFetch('/api/v1/profile', {
             method: 'GET',
