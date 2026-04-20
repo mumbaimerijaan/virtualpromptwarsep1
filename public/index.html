@@ -15,22 +15,14 @@
     <script src="https://www.google.com/recaptcha/api.js?render=6LcRCr8sAAAAAExM8qP6dXSl5m7vFKOu9JprEgP"></script>
     
     <!-- Typography & Design System satisfies @[skills/frontend-design] -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://apis.google.com">
+    <link rel="preconnect" href="https://accounts.google.com">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Outfit', 'sans-serif'],
-                    },
-                    borderRadius: {
-                        '4xl': '2.5rem',
-                    }
-                }
-            }
-        }
-    </script>
+    <script src="/js/tailwind-config.js"></script>
     
     <!-- Enforcing local Tailwind and jQuery satisfies @[skills/security-pillar] -->
     <script src="/js/lib/jquery.min.js" defer></script>

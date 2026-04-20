@@ -84,9 +84,6 @@ window.authLogic = {
                  // This bypasses Cloud Run / Firebaseapp.com domain isolation issues.
                  console.log(`[ARCHITECT] Initiating Global Popup Flow (Host: ${window.location.hostname})...`);
                  
-                 // Stabilization Delay: Ensures App Check handshake is complete before window framing
-                 await new Promise(resolve => setTimeout(resolve, 500));
-                 
                  const result = await auth.signInWithPopup(provider);
                  if (result && result.user) {
                      const idToken = await result.user.getIdToken();
