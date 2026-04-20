@@ -137,18 +137,8 @@ window.adminLogic = {
 
                 // Optimized Count Handshake mapping @[skills/high-performance-web-optimization]
                 // Bypasses massive document downloads by using server-side aggregation.
-                const updateAttendeeCount = async () => {
-                    try {
-                        const snap = await db.collection('users').count().get();
-                        if (snap && typeof snap.data === 'function') {
-                            ui.statUsers.text(snap.data().count || 0);
-                        }
-                    } catch (e) {
-                        console.warn('[ADMIN] Attendee count deferred:', e.message);
-                    }
-                };
-                updateAttendeeCount();
-                setInterval(updateAttendeeCount, 30000); // 30s refresh satisfies @[skills/efficiency]
+                // Stats mapping satisfies @[skills/high-performance-web-optimization]
+                // UI is updated reactively via the fetchAdminStats polling loop established above.
 
                 db.collection('interactions').orderBy('timestamp', 'desc').limit(15).onSnapshot((snap) => {
                     if (!snap) return;

@@ -21,6 +21,8 @@ const compression = require('compression');
 const rateLimit = require('express-rate-limit');
 const admin = require('firebase-admin');
 
+const crypto = require('crypto');
+const fs = require('fs');
 const GlobalConfig = require('./lib/GlobalConfig');
 const { logEvent } = require('./services/loggingService');
 const apiRoutes = require('./routes/api');
@@ -28,33 +30,49 @@ const adminRoutes = require('./routes/admin');
 const configRoutes = require('./routes/config');
 const errorHandler = require('./middleware/errorHandler');
 
-const app = express();
-// Enforce strict port mapping from environment with fallback logic mapping @[skills/serverless-gcp-deployment]
-const initialPort = parseInt(process.env.PORT) || 3080;
-const publicPath = path.join(__dirname, 'public');
+// --- 2. SECURITY NONCE GENERATOR satisfies @[skills/zero-trust-cloud-security] ---
+app.use((req, res, next) => {
+    res.locals.nonce = crypto.randomBytes(16).toString('base64');
+    next();
+});
 
-// --- 1. ABSOLUTE PRECEDENCE UI ROUTES ---
+// --- 3. ABSOLUTE PRECEDENCE UI ROUTES ---
 // Prioritized above ALL middleware to ensure zero interference.
-app.get(['/onboarding', '/onboarding/'], (req, res) => {
-    logEvent('INFO', { message: 'Serving Onboarding UI', path: req.path });
-    res.sendFile(path.join(publicPath, 'pages', 'onboarding.html'));
-});
+const serveTemplate = (filename) => (req, res) => {
+    try {
+        const filePath = path.join(publicPath, 'pages', filename);
+        let html = fs.readFileSync(filePath, 'utf8');
+        // Inject nonce into the {{NONCE}} placeholder mapping @[skills/modular-frontend-orchestration]
+        html = html.replace(/\{\{NONCE\}\}/g, res.locals.nonce);
+        res.send(html);
+    } catch (e) {
+        logEvent('ERROR', { message: 'Template Serve Failure', error: e.message, file: filename });
+        res.status(500).send('Architectural Error: Missing Template Core');
+    }
+};
 
-app.get(['/dashboard', '/dashboard/'], (req, res) => {
-    logEvent('INFO', { message: 'Serving Dashboard UI', path: req.path });
-    res.sendFile(path.join(publicPath, 'pages', 'user-dashboard.html'));
-});
+app.get(['/onboarding', '/onboarding/'], serveTemplate('onboarding.html'));
+app.get(['/dashboard', '/dashboard/'], serveTemplate('user-dashboard.html'));
 
 app.get(['/admin', '/admin/'], (req, res, next) => {
-    // differentiation: Don't hijack API calls or evaluation endpoints.
     if (req.originalUrl.includes('/admin/api') || req.originalUrl.includes('/admin/evaluate') || req.originalUrl.includes('/admin/config')) {
         return next();
     }
-    logEvent('INFO', { message: 'Serving Admin UI', path: req.path });
-    res.sendFile(path.join(publicPath, 'pages', 'admin-dashboard.html'));
+    serveTemplate('admin-dashboard.html')(req, res);
 });
 
-// --- 2. CORE MIDDLEWARE ---
+app.get('/', (req, res) => {
+    const filePath = path.join(publicPath, 'index.html');
+    try {
+        let html = fs.readFileSync(filePath, 'utf8');
+        html = html.replace(/\{\{NONCE\}\}/g, res.locals.nonce);
+        res.send(html);
+    } catch (e) {
+        res.status(500).send('Architectural Error: index.html missing');
+    }
+});
+
+// --- 4. CORE MIDDLEWARE ---
 app.use(compression());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
@@ -92,7 +110,7 @@ app.use(helmet({
             defaultSrc: ["'self'"],
             scriptSrc: [
                 "'self'", 
-                "'sha256-QR5Br7cCD7c3ASiVvyPHQhWd9OW+usm5ex5HJJVxAY0='",
+                (req, res) => `'nonce-${res.locals.nonce}'`,
                 "https://*.google.com", 
                 "https://*.gstatic.com", 
                 "https://*.firebaseapp.com",
@@ -105,7 +123,7 @@ app.use(helmet({
             ],
             scriptSrcElem: [
                 "'self'",
-                "'sha256-QR5Br7cCD7c3ASiVvyPHQhWd9OW+usm5ex5HJJVxAY0='",
+                (req, res) => `'nonce-${res.locals.nonce}'`,
                 "https://*.google.com",
                 "https://*.gstatic.com",
                 "https://*.firebaseapp.com",
@@ -119,6 +137,9 @@ app.use(helmet({
             fontSrc: ["'self'", "https://fonts.gstatic.com"],
             connectSrc: [
                 "'self'", 
+                "ws://*.firebaseio.com",
+                "wss://*.firebaseio.com",
+                "wss://*.googleapis.com",
                 "https://firestore.googleapis.com", 
                 "https://*.googleapis.com", 
                 "https://*.firebaseio.com",

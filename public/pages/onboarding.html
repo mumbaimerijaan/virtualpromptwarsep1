@@ -7,18 +7,18 @@
     <link rel="icon" href="data:,">
 
     <!-- Localized jQuery 3.7.1 satisfies Resilience guards -->
-    <script src="/js/lib/jquery.min.js" defer></script>
+    <script nonce="{{NONCE}}" src="/js/lib/jquery.min.js" defer></script>
 
     <!-- Typography & Design System satisfies @[skills/frontend-design] -->
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="/js/tailwind-config.js"></script>
+    <script nonce="{{NONCE}}" src="https://cdn.tailwindcss.com"></script>
+    <script nonce="{{NONCE}}" src="/js/tailwind-config.js"></script>
     
     <!-- Integration Scripts satisfying Architectural Integrity mapping @[skills/google-services-mastery] -->
     <link rel="stylesheet" href="/css/styles.css">
-    <script src="/dist/js/utils.js" defer></script>
-    <script src="/dist/js/role.js" defer></script>
-    <script src="/dist/js/onboarding.js" defer></script>
+    <script nonce="{{NONCE}}" src="/dist/js/utils.js" defer></script>
+    <script nonce="{{NONCE}}" src="/dist/js/role.js" defer></script>
+    <script nonce="{{NONCE}}" src="/dist/js/onboarding.js" defer></script>
 </head>
 <body class="min-h-screen font-sans bg-pastel p-6 sm:p-12 flex justify-center items-start overflow-y-auto">
     <main class="glass-pwa w-full max-w-2xl p-10 sm:p-14 rounded-4xl shadow-2xl transition-all duration-700">
