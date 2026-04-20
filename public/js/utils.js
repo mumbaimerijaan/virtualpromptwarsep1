@@ -126,6 +126,32 @@ namespace.utils = {
             return 'N/A';
         }
     }
+    /**
+     * Show a persistent, non-dismissible system alert for critical configuration errors.
+     * satisfies @[skills/resilient-data-patterns]
+     * @param {string} title 
+     * @param {string} message 
+     */
+    showSystemAlert: (title, message) => {
+        const alertHtml = `
+            <div id="system-critical-alert" class="fixed inset-0 z-[1000] bg-slate-900/60 backdrop-blur-xl flex items-center justify-center p-6 text-center animate-in fade-in duration-500">
+                <div class="glass-pwa max-w-md p-10 rounded-4xl shadow-2xl border-white/40 space-y-6">
+                    <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <svg class="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                    </div>
+                    <h2 class="text-2xl font-extrabold text-blue-900/80 tracking-tight leading-tight">${title}</h2>
+                    <p class="text-sm text-slate-500 font-medium leading-relaxed">${message}</p>
+                    <div class="pt-4">
+                        <code class="block bg-slate-100 p-4 rounded-2xl text-[10px] text-left overflow-x-auto font-mono text-slate-600">
+                            # To fix, add this to your .env file:<br>
+                            FIREBASE_API_KEY=your_key_here
+                        </code>
+                    </div>
+                </div>
+            </div>
+        `;
+        $('body').append(alertHtml);
+    }
 };
 
 if (typeof module !== 'undefined') module.exports = namespace.utils;

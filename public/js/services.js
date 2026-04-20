@@ -63,7 +63,16 @@ window.services = {
                 const configRes = await fetch('/api/v1/config');
                 if (!configRes.ok) throw new Error('Bootstrap Failure: Network');
                 const firebaseConfig = await configRes.json();
-
+                
+                // Security Resilience Check mapping @[skills/zero-trust-cloud-security]
+                if (firebaseConfig.apiKey === 'ROTATION_REQUIRED' || !firebaseConfig.apiKey) {
+                    window.utils.showSystemAlert(
+                        'Configuration Required',
+                        'Authentication is currently disabled because the Firebase API Key has not been configured. For security, keys must now be provided via environment variables.'
+                    );
+                    throw new Error('Bootstrap Aborted: API Key Missing');
+                }
+                
                 if (typeof firebase !== 'undefined' && !firebase.apps.length) {
                     firebase.initializeApp(firebaseConfig);
                     
