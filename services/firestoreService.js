@@ -102,7 +102,7 @@ const syncUser = async ({ uid, name, email }) => {
  * Updates the user profile highlights.
  */
 const updateUserProfile = async (uid, payload) => {
-    if (isUsingSandbox) {
+    if (process.env.NODE_ENV === 'test' || isUsingSandbox) {
         sandboxDB.users[uid] = { ...sandboxDB.users[uid], ...payload, onboardingComplete: true };
         persistSandbox();
         return true;
@@ -163,7 +163,7 @@ const saveInteraction = async ({ id, userId, contactId, type, notes, summary, ac
 };
 
 const getAdminStats = async () => {
-    if (isUsingSandbox) return { 
+    if (process.env.NODE_ENV === 'test' || isUsingSandbox) return { 
         usersCount: Object.keys(sandboxDB.users).length, 
         interactionsCount: sandboxDB.interactions.length, 
         recentActivity: sandboxDB.interactions.slice(-5).reverse() 
@@ -194,7 +194,7 @@ module.exports = {
     getSandboxDB: () => sandboxDB,
     persistSandbox,
     getLeaderboard: async () => {
-        if (isUsingSandbox) return Object.values(sandboxDB.users).sort((a,b) => b.interactionCount - a.interactionCount).slice(0, 5);
+        if (process.env.NODE_ENV === 'test' || isUsingSandbox) return Object.values(sandboxDB.users).sort((a,b) => b.interactionCount - a.interactionCount).slice(0, 5);
         try {
             const snap = await getDb().collection(COLLECTIONS.USERS).orderBy('interactionCount', 'desc').limit(5).get();
             return snap.docs.map(d => d.data());
@@ -204,7 +204,7 @@ module.exports = {
         }
     },
     getUserProfile: async (uid) => {
-        if (isUsingSandbox) {
+        if (process.env.NODE_ENV === 'test' || isUsingSandbox) {
             const user = sandboxDB.users[uid];
             if (!user && uid === 'mock_user_123') {
                 return {

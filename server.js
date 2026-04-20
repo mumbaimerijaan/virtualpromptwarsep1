@@ -165,7 +165,7 @@ const firebaseAppCheckMiddleware = async (req, res, next) => {
     // 🛡️ Development Bypass mapping @[skills/resilient-data-patterns]
     // Allows local testing even if App Check attestation is stalling or failing.
     const isLocal = req.hostname === 'localhost' || req.hostname === '127.0.0.1';
-    if (process.env.NODE_ENV !== 'production' && isLocal) {
+    if (process.env.NODE_ENV === 'development' && isLocal) {
         return next();
     }
 

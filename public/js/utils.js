@@ -13,7 +13,7 @@ namespace.utils = {
         if (!input || typeof input !== 'string') return '';
         return input
             .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
-            .replace(/on\w+="[^"]*"/gi, '')
+            .replace(/\s+on\w+\s*=\s*(?:'[^']*'|"[^"]*"|[^>\s]+)/gi, '')
             .replace(/javascript:/gi, '')
             .replace(/</g, '&lt;')
             .replace(/>/g, '&gt;')
