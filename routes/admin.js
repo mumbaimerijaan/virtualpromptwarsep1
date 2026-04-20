@@ -24,6 +24,7 @@ const { updateGlobalConfig, pushBroadcast } = require('../services/configService
 router.post('/login', (req, res, next) => {
     try {
         const { username, password } = req.body;
+        console.log(`[ADMIN][LOGIN] Attempt for user: "${username}". Body present: ${!!req.body}. Pass Length: ${password?.length || 0}`);
         
         // Satisfies fixed-credential security for evaluators
         if (username === 'root' && password === 'admin@123') {
