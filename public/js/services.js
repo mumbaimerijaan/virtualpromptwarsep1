@@ -79,7 +79,7 @@ window.services = {
                     // Enforce Global Resilience Mapping satisfies @[skills/resilient-data-patterns]
                     // This must be set before any collection/document references are created.
                     const db = firebase.firestore();
-                    db.settings({ experimentalAutoDetectLongPolling: true });
+                    db.settings({ experimentalAutoDetectLongPolling: true, merge: true });
                     
                     console.log('[ARCHITECT] Global Bootstrap Successful for:', firebaseConfig.projectId);
                 }
