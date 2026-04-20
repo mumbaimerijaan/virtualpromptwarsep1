@@ -86,6 +86,24 @@ namespace.utils = {
         const data = await response.json();
         if (!response.ok) throw new Error(data.error || 'Request failed');
         return data;
+    },
+
+    /**
+     * Resolves dates from both Firebase SDK objects and POJOs mapping @[skills/resilient-data-patterns]
+     */
+    formatDate: (timestamp) => {
+        if (!timestamp) return 'Just now';
+        try {
+            // Case 1: Firebase Timestamp instance
+            if (typeof timestamp.toDate === 'function') return timestamp.toDate().toLocaleString();
+            // Case 2: Firestore POJO { _seconds, _nanoseconds }
+            if (timestamp._seconds) return new Date(timestamp._seconds * 1000).toLocaleString();
+            // Case 3: Standard Native Date or ISO string
+            const d = new Date(timestamp);
+            return isNaN(d.getTime()) ? 'N/A' : d.toLocaleString();
+        } catch (e) {
+            return 'N/A';
+        }
     }
 };
 

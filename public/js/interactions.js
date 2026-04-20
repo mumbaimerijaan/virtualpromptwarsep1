@@ -88,7 +88,11 @@ window.interactionsLogic = {
                         .filter(note => !note.type || note.type === 'QUICK_NOTE');
 
                     if (cloudNotes.length > 0) {
-                        notesHistory = cloudNotes.sort((a, b) => (b.timestamp?.toDate() || 0) - (a.timestamp?.toDate() || 0));
+                        notesHistory = cloudNotes.sort((a, b) => {
+                             const dateA = a.timestamp?._seconds || (typeof a.timestamp?.toDate === 'function' ? a.timestamp.toDate().getTime() : new Date(a.timestamp).getTime()) || 0;
+                             const dateB = b.timestamp?._seconds || (typeof b.timestamp?.toDate === 'function' ? b.timestamp.toDate().getTime() : new Date(b.timestamp).getTime()) || 0;
+                             return dateB - dateA;
+                        });
                         renderHistory();
                     } else if (window.location.hostname === 'localhost') {
                          // FALLBACK: Fetch from local activity ledger
@@ -136,7 +140,7 @@ window.interactionsLogic = {
             ui.exportBtn.removeClass('hidden');
 
             notesHistory.forEach((note) => {
-                const date = note.timestamp ? note.timestamp.toDate().toLocaleString() : 'Just now';
+                const date = window.utils.formatDate(note.timestamp);
                 ui.notesList.append(`
                     <tr class="hover:bg-white/60 cursor-pointer transition-colors group" data-id="${note.id}">
                         <td class="px-6 py-4 text-[10px] font-bold text-gray-400 tabular-nums">${date}</td>
@@ -157,7 +161,7 @@ window.interactionsLogic = {
         };
 
         const showNoteModal = (note) => {
-            const date = note.timestamp ? note.timestamp.toDate().toLocaleString() : 'Just now';
+            const date = window.utils.formatDate(note.timestamp);
             ui.modalTimestamp.text(date);
             ui.modalNotes.text(note.notes || 'Visual Content');
             ui.modalSummary.text(note.summary);
@@ -197,7 +201,7 @@ window.interactionsLogic = {
             
             let y = 40;
             notesHistory.forEach((note, index) => {
-                const date = note.timestamp ? note.timestamp.toDate().toLocaleString() : 'N/A';
+                const date = window.utils.formatDate(note.timestamp);
                 
                 if (y > 250) { doc.addPage(); y = 20; }
                 
