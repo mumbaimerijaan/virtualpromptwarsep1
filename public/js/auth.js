@@ -76,32 +76,29 @@ window.authLogic = {
              const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 
              try {
-                 if (isLocal) {
-                     // 🛡️ Local Hardening: Use Popup on localhost to bypass HTTP redirect restrictions satisfy @[skills/resilient-data-patterns]
-                     console.log('[ARCHITECT] Local environment detected. Preparing Hardened Popup...');
+                 // 🛡️ Global Hardening: Use Popup for both local and production Mapping @[skills/resilient-data-patterns]
+                 // This bypasses Cloud Run / Firebaseapp.com domain isolation issues.
+                 console.log(`[ARCHITECT] Initiating Global Popup Flow (Host: ${window.location.hostname})...`);
+                 
+                 // Stabilization Delay: Ensures App Check handshake is complete before window framing
+                 await new Promise(resolve => setTimeout(resolve, 500));
+                 
+                 const result = await auth.signInWithPopup(provider);
+                 if (result && result.user) {
+                     const idToken = await result.user.getIdToken();
+                     window.roleState.setSession(idToken, 'user');
                      
-                     // Stabilization Delay: Ensures App Check handshake is complete before window framing
-                     await new Promise(resolve => setTimeout(resolve, 500));
+                     const syncRes = await fetch('/api/v1/sync-user', {
+                         method: 'POST',
+                         headers: { 
+                             'Content-Type': 'application/json',
+                             'Authorization': `Bearer ${idToken}`
+                         },
+                         body: JSON.stringify({ uid: result.user.uid, name: result.user.displayName, email: result.user.email })
+                     });
                      
-                     const result = await auth.signInWithPopup(provider);
-                     if (result && result.user) {
-                         const idToken = await result.user.getIdToken();
-                         window.roleState.setSession(idToken, 'user');
-                         const syncRes = await fetch('/api/v1/sync-user', {
-                             method: 'POST',
-                             headers: { 
-                                 'Content-Type': 'application/json',
-                                 'Authorization': `Bearer ${idToken}`
-                             },
-                             body: JSON.stringify({ uid: result.user.uid, name: result.user.displayName, email: result.user.email })
-                         });
-                         const payload = await syncRes.json();
-                         window.location.replace(payload.isNewUser ? '/onboarding' : '/dashboard');
-                     }
-                 } else {
-                     // 🚀 Production Hardening: Use Redirect satisfies Architectural Hardening Directive
-                     console.log('[ARCHITECT] Production environment detected. Initiating Redirect Flow.');
-                     await auth.signInWithRedirect(provider);
+                     const payload = await syncRes.json();
+                     window.location.replace(payload.isNewUser ? '/onboarding' : '/dashboard');
                  }
              } catch (error) {
                  console.error('Auth Initialization Failed', error);
