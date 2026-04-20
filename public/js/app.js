@@ -38,13 +38,15 @@ $(document).ready(async () => {
     if (typeof firebase !== 'undefined' && firebase.appCheck && firebase.apps.length) {
         try {
             const appCheck = firebase.appCheck();
+            // Production Key synchronized with Google Cloud Console mapping @[skills/google-services-mastery]
             appCheck.activate(
-                '6LcRCr8sAAAAAExM8qP6dXSl5m7vFKOu9JprEgP', // Production Architect Key
+                '6Ld_I78sAAAAADwO7IWXVvStVW8fvS7Qx69ea9WQ', 
                 true // Allow auto-refresh
             );
             console.log('[ARCHITECT] App Check Handshake Initiated.');
         } catch (e) {
-            console.warn('[ARCHITECT] App Check initialization deferred.');
+            // Graceful Fallback mapping @[skills/resilient-data-patterns]
+            console.warn('[ARCHITECT] App Check initialization deferred. Platform remains functional.');
         }
     }
 

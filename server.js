@@ -161,10 +161,12 @@ app.use(helmet({
             frameSrc: [
                 "'self'", 
                 "https://*.google.com",
-                "https://*.firebaseapp.com", 
+                "https://*.gstatic.com",
+                "https://*.firebaseapp.com",
                 "https://apis.google.com",
                 "https://www.google.com/recaptcha/",
-                "https://recaptcha.google.com/"
+                "https://recaptcha.google.com/",
+                "https://www.gstatic.com/recaptcha/"
             ],
             childSrc: [
                 "'self'", 
@@ -175,7 +177,7 @@ app.use(helmet({
         },
     },
     crossOriginEmbedderPolicy: false,
-    crossOriginOpenerPolicy: { policy: "unsafe-none" }
+    crossOriginOpenerPolicy: { policy: "same-origin-allow-popups" }
 }));
 
 if (!admin.apps.length) {
