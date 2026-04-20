@@ -15,31 +15,31 @@
     <script src="/dist/js/onboarding.js" defer></script>
 </head>
 <body class="min-h-screen font-sans bg-pastel p-4 flex justify-center items-start overflow-y-auto pt-10 pb-10">
-    <main class="glass-pwa w-full max-w-2xl p-6 sm:p-10 rounded-2xl shadow-xl">
+    <main class="glass-pwa w-full max-w-2xl p-6 sm:p-10 rounded-3xl shadow-xl">
         <div class="text-center mb-8">
             <h1 class="text-3xl font-bold text-gray-900 tracking-tight mb-2">Welcome to the Event!</h1>
-            <p class="text-gray-600">Please complete your profile to enable personalized AI Networking Insights.</p>
+            <p class="text-gray-600 font-medium">Please complete your profile to enable personalized AI Networking Insights.</p>
         </div>
 
         <form id="onboarding-form" class="space-y-8">
             <!-- Basic Info -->
             <section class="space-y-4">
-                <h3 class="text-lg font-semibold border-b border-gray-300/50 pb-2 text-gray-800">1. Basic Info</h3>
+                <h3 class="text-xs font-black uppercase text-gray-400 tracking-widest border-b border-white/20 pb-2">1. Basic Info</h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div><label class="block text-sm font-medium text-gray-700 mb-1">Company / Organization</label>
-                    <input type="text" id="ob-company" required class="w-full bg-white/70 px-4 py-2 border border-white/50 rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none" placeholder="e.g. Acme Corp"></div>
-                    <div><label class="block text-sm font-medium text-gray-700 mb-1">Role / Job Title</label>
-                    <input type="text" id="ob-role" required class="w-full bg-white/70 px-4 py-2 border border-white/50 rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none" placeholder="e.g. Product Manager"></div>
+                    <div><label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 px-1">Company / Organization</label>
+                    <input type="text" id="ob-company" required class="w-full bg-white/40 border border-white/60 rounded-xl px-4 py-3 focus:ring-4 focus:ring-indigo-100 focus:outline-none text-sm font-medium transition-all" placeholder="e.g. Acme Corp"></div>
+                    <div><label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 px-1">Role / Job Title</label>
+                    <input type="text" id="ob-role" required class="w-full bg-white/40 border border-white/60 rounded-xl px-4 py-3 focus:ring-4 focus:ring-indigo-100 focus:outline-none text-sm font-medium transition-all" placeholder="e.g. Product Manager"></div>
                 </div>
             </section>
 
             <!-- Professional Context -->
             <section class="space-y-4">
-                <h3 class="text-lg font-semibold border-b border-gray-300/50 pb-2 text-gray-800">2. Professional Context</h3>
+                <h3 class="text-xs font-black uppercase text-gray-400 tracking-widest border-b border-white/20 pb-2">2. Professional Context</h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Field / Domain</label>
-                        <select id="ob-domain" required class="w-full bg-white/70 px-4 py-2 border border-white/50 rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none text-gray-700">
+                        <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 px-1">Field / Domain</label>
+                        <select id="ob-domain" required class="w-full bg-white/40 border border-white/60 rounded-xl px-4 py-3 focus:ring-4 focus:ring-indigo-100 focus:outline-none text-sm font-medium transition-all text-gray-700">
                             <option value="">Select Domain...</option>
                             <option value="Software / IT">Software / IT</option>
                             <option value="Marketing">Marketing</option>
@@ -49,8 +49,8 @@
                         </select>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Years of Experience</label>
-                        <select id="ob-experience" required class="w-full bg-white/70 px-4 py-2 border border-white/50 rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none text-gray-700">
+                        <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 px-1">Years of Experience</label>
+                        <select id="ob-experience" required class="w-full bg-white/40 border border-white/60 rounded-xl px-4 py-3 focus:ring-4 focus:ring-indigo-100 focus:outline-none text-sm font-medium transition-all text-gray-700">
                             <option value="">Select Experience...</option>
                             <option value="0-1">0–1</option>
                             <option value="1-3">1–3</option>
@@ -63,49 +63,49 @@
 
             <!-- Event Intent (Multi) -->
             <section class="space-y-3 block">
-                <h3 class="text-lg font-semibold border-b border-gray-300/50 pb-2 text-gray-800 mb-2">3. Event Intent <span class="text-xs font-normal text-gray-500">(Select all that apply)</span></h3>
+                <h3 class="text-xs font-black uppercase text-gray-400 tracking-widest border-b border-white/20 pb-2 mb-2">3. Event Intent</h3>
                 <div class="flex flex-wrap gap-2" id="intent-group">
                     <!-- Labels wrap checkboxes -->
-                    <label class="cursor-pointer select-none bg-white/50 border border-white/20 hover:bg-blue-100 rounded-full px-4 py-2 text-sm font-medium text-gray-700 transition">
+                    <label class="cursor-pointer select-none bg-white/40 border border-white/60 hover:bg-cyan-50 rounded-full px-5 py-2 text-xs font-bold text-gray-500 transition-all">
                         <input type="checkbox" name="intent" value="Networking" class="hidden">Networking</label>
-                    <label class="cursor-pointer select-none bg-white/50 border border-white/20 hover:bg-blue-100 rounded-full px-4 py-2 text-sm font-medium text-gray-700 transition">
+                    <label class="cursor-pointer select-none bg-white/40 border border-white/60 hover:bg-cyan-50 rounded-full px-5 py-2 text-xs font-bold text-gray-500 transition-all">
                         <input type="checkbox" name="intent" value="Learning" class="hidden">Learning</label>
-                    <label class="cursor-pointer select-none bg-white/50 border border-white/20 hover:bg-blue-100 rounded-full px-4 py-2 text-sm font-medium text-gray-700 transition">
+                    <label class="cursor-pointer select-none bg-white/40 border border-white/60 hover:bg-cyan-50 rounded-full px-5 py-2 text-xs font-bold text-gray-500 transition-all">
                         <input type="checkbox" name="intent" value="Hiring" class="hidden">Hiring</label>
-                    <label class="cursor-pointer select-none bg-white/50 border border-white/20 hover:bg-blue-100 rounded-full px-4 py-2 text-sm font-medium text-gray-700 transition">
+                    <label class="cursor-pointer select-none bg-white/40 border border-white/60 hover:bg-cyan-50 rounded-full px-5 py-2 text-xs font-bold text-gray-500 transition-all">
                         <input type="checkbox" name="intent" value="Exploring ideas" class="hidden">Exploring ideas</label>
-                    <label class="cursor-pointer select-none bg-white/50 border border-white/20 hover:bg-blue-100 rounded-full px-4 py-2 text-sm font-medium text-gray-700 transition">
+                    <label class="cursor-pointer select-none bg-white/40 border border-white/60 hover:bg-cyan-50 rounded-full px-5 py-2 text-xs font-bold text-gray-500 transition-all">
                         <input type="checkbox" name="intent" value="Collaboration" class="hidden">Collaboration</label>
                 </div>
             </section>
 
             <!-- Interests -->
             <section class="space-y-3 block">
-                <h3 class="text-lg font-semibold border-b border-gray-300/50 pb-2 text-gray-800 mb-2">4. Areas of Interest <span class="text-xs font-normal text-gray-500">(Select all that apply)</span></h3>
+                <h3 class="text-xs font-black uppercase text-gray-400 tracking-widest border-b border-white/20 pb-2 mb-2">4. Areas of Interest</h3>
                 <div class="flex flex-wrap gap-2" id="interests-group">
-                    <label class="cursor-pointer select-none bg-white/50 border border-white/20 hover:bg-purple-100 rounded-full px-4 py-2 text-sm font-medium text-gray-700 transition">
+                    <label class="cursor-pointer select-none bg-white/40 border border-white/60 hover:bg-indigo-50 rounded-full px-5 py-2 text-xs font-bold text-gray-500 transition-all">
                         <input type="checkbox" name="interests" value="AI / ML" class="hidden">AI / ML</label>
-                    <label class="cursor-pointer select-none bg-white/50 border border-white/20 hover:bg-purple-100 rounded-full px-4 py-2 text-sm font-medium text-gray-700 transition">
+                    <label class="cursor-pointer select-none bg-white/40 border border-white/60 hover:bg-indigo-50 rounded-full px-5 py-2 text-xs font-bold text-gray-500 transition-all">
                         <input type="checkbox" name="interests" value="Web Dev" class="hidden">Web Dev</label>
-                    <label class="cursor-pointer select-none bg-white/50 border border-white/20 hover:bg-purple-100 rounded-full px-4 py-2 text-sm font-medium text-gray-700 transition">
+                    <label class="cursor-pointer select-none bg-white/40 border border-white/60 hover:bg-indigo-50 rounded-full px-5 py-2 text-xs font-bold text-gray-500 transition-all">
                         <input type="checkbox" name="interests" value="Startups" class="hidden">Startups</label>
-                    <label class="cursor-pointer select-none bg-white/50 border border-white/20 hover:bg-purple-100 rounded-full px-4 py-2 text-sm font-medium text-gray-700 transition">
+                    <label class="cursor-pointer select-none bg-white/40 border border-white/60 hover:bg-indigo-50 rounded-full px-5 py-2 text-xs font-bold text-gray-500 transition-all">
                         <input type="checkbox" name="interests" value="Design" class="hidden">Design</label>
-                    <label class="cursor-pointer select-none bg-white/50 border border-white/20 hover:bg-purple-100 rounded-full px-4 py-2 text-sm font-medium text-gray-700 transition">
+                    <label class="cursor-pointer select-none bg-white/40 border border-white/60 hover:bg-indigo-50 rounded-full px-5 py-2 text-xs font-bold text-gray-500 transition-all">
                         <input type="checkbox" name="interests" value="Data" class="hidden">Data</label>
                 </div>
             </section>
 
             <!-- Optional text -->
             <section class="space-y-2">
-                <label for="ob-optional" class="block text-sm font-medium text-gray-700">What do you want to gain from this event? <span class="text-gray-400 font-normal">(Optional)</span></label>
-                <textarea id="ob-optional" rows="2" class="w-full bg-white/70 px-4 py-2 border border-white/50 rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none resize-none placeholder-gray-400" placeholder="e.g. Find technical co-founders..."></textarea>
+                <label for="ob-optional" class="block text-[10px] font-black text-gray-400 uppercase tracking-widest px-1">Gains & Perspectives <span class="text-gray-300 font-normal">(Optional)</span></label>
+                <textarea id="ob-optional" rows="2" class="w-full bg-white/40 border border-white/60 rounded-xl px-4 py-3 focus:ring-4 focus:ring-indigo-100 focus:outline-none resize-none placeholder-gray-400 text-sm font-medium transition-all" placeholder="e.g. Find technical co-founders..."></textarea>
             </section>
 
-            <button type="submit" id="ob-submit-btn" class="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition-all font-bold shadow-lg shadow-blue-500/40 text-lg">
+            <button type="submit" id="ob-submit-btn" class="w-full btn-pill-cyan py-4">
                 Complete Profile & Enter Dashboard
             </button>
-            <p id="ob-error" class="hidden text-red-600 font-medium text-sm text-center"></p>
+            <p id="ob-error" class="hidden text-red-600 font-medium text-sm text-center font-bold"></p>
         </form>
     </main>
 

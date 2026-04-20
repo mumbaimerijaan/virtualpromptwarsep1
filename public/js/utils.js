@@ -82,6 +82,27 @@ namespace.utils = {
         }
     },
 
+    /**
+     * Globally blocks interaction during network/auth handshakes satisfies @[skills/resilient-data-patterns].
+     */
+    loaderCount: 0,
+    showLoader: () => {
+        namespace.utils.loaderCount++;
+        const loader = $('#global-loader');
+        if (loader.length && namespace.utils.loaderCount === 1) {
+            loader.css('display', 'flex').attr('aria-hidden', 'false');
+        }
+    },
+    hideLoader: () => {
+        namespace.utils.loaderCount = Math.max(0, namespace.utils.loaderCount - 1);
+        const loader = $('#global-loader');
+        if (loader.length && namespace.utils.loaderCount === 0) {
+            loader.fadeOut(200, function() { 
+                $(this).attr('aria-hidden', 'true');
+            });
+        }
+    },
+
     formatResponse: async (response) => {
         const data = await response.json();
         if (!response.ok) throw new Error(data.error || 'Request failed');

@@ -50,9 +50,9 @@
         </nav>
 
         <div class="pt-6 border-t border-white/40">
-            <button id="logout-btn" class="w-full bg-red-50 text-red-600 font-bold p-3 rounded-xl hover:bg-red-100 transition-colors flex items-center justify-center gap-2">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
-                Terminate
+            <button id="logout-btn" class="w-full bg-white/40 text-gray-400 font-bold p-3 rounded-full hover:text-red-500 transition-all flex items-center justify-center gap-2 border border-white/20">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" width="16" height="16"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                Sign Out
             </button>
         </div>
     </aside>
@@ -91,10 +91,10 @@
                         <input type="number" id="timer-input" value="60" class="w-full bg-white/40 border border-white/60 rounded-xl p-4 focus:ring-4 focus:ring-indigo-100 outline-none text-xl font-black text-indigo-600 transition-all disabled:opacity-50 disabled:bg-indigo-50/30">
                     </div>
                     <div class="pt-2">
-                        <button id="start-submission-btn" class="w-full bg-indigo-600 text-white font-black py-4 rounded-2xl hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-200 active:scale-[0.98]">
+                        <button id="start-submission-btn" class="w-full btn-pill-cyan py-4">
                             START SUBMISSION
                         </button>
-                        <button id="end-submission-btn" class="hidden w-full bg-red-500 text-white font-black py-4 rounded-2xl hover:bg-red-600 transition-all shadow-xl shadow-red-200 animate-pulse">
+                        <button id="end-submission-btn" class="hidden w-full bg-red-500 text-white font-black py-4 rounded-full hover:bg-red-600 transition-all shadow-xl shadow-red-200 animate-pulse">
                             END SUBMISSION
                         </button>
                     </div>

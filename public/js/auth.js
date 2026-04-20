@@ -42,6 +42,7 @@ window.authLogic = {
             const username = ui.adminUser.val();
             const password = ui.adminPass.val();
             
+            if (window.utils && window.utils.showLoader) window.utils.showLoader();
             try {
                 const res = await fetch('/admin/login', {
                     method: 'POST',
@@ -59,6 +60,8 @@ window.authLogic = {
                 }
             } catch (err) {
                  ui.errorMsg.text('Network error. Unable to verify.').removeClass('hidden');
+            } finally {
+                if (window.utils && window.utils.hideLoader) window.utils.hideLoader();
             }
         });
 
@@ -72,6 +75,7 @@ window.authLogic = {
                  return;
              }
 
+             if (window.utils && window.utils.showLoader) window.utils.showLoader();
              const provider = new firebase.auth.GoogleAuthProvider();
              const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 
@@ -103,6 +107,8 @@ window.authLogic = {
              } catch (error) {
                  console.error('Auth Initialization Failed', error);
                  ui.errorMsg.text(`Authentication failed: ${error.message}`).removeClass('hidden');
+             } finally {
+                 if (window.utils && window.utils.hideLoader) window.utils.hideLoader();
              }
         });
 

@@ -6,13 +6,13 @@ body.bg-pastel {
     background-size: cover;
 }
 
-/* Base Glass Class */
+/* Base Glass Class - Refined for premium depth */
 .glass-pwa {
-    background: rgba(255, 255, 255, 0.35);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.5);
-    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+    background: rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.1);
 }
 
 /* Interactive Glass Elements mapping @[skills/high-performance-web-optimization] */
@@ -31,9 +31,53 @@ body.bg-pastel {
     box-shadow: 0 6px 20px 0 rgba(31, 38, 135, 0.1);
 }
 
-.glass-text {
-    background: rgba(255,255,255,0.7);
-    border-radius: 4px;
+/* Premium Pill Buttons satisfying @[skills/modular-frontend-orchestration] */
+.btn-pill-cyan {
+    background: linear-gradient(135deg, #67e8f9 0%, #3b82f6 100%);
+    color: white;
+    border-radius: 9999px;
+    font-weight: bold;
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+    transition: all 0.3s ease;
+}
+
+.btn-pill-cyan:hover:not(:disabled) {
+    transform: scale(1.02);
+    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.6);
+}
+
+.btn-pill-cyan:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    filter: grayscale(0.5);
+}
+
+/* Global Interaction Blocker mapping @[skills/resilient-data-patterns] */
+#global-loader {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: rgba(17, 24, 39, 0.65); /* Dark gray overlay */
+    backdrop-filter: blur(4px);
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: wait;
+}
+
+.spinner {
+    width: 60px;
+    height: 60px;
+    border: 5px solid rgba(255, 255, 255, 0.1);
+    border-top: 5px solid #67e8f9;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
 
 /* Master Toast System satisfies @[skills/modular-frontend-orchestration] */
@@ -41,7 +85,7 @@ body.bg-pastel {
     min-width: 320px;
     padding: 1rem 1.25rem;
     border-radius: 1rem;
-    background: rgba(255, 255, 255, 0.8);
+    background: rgba(255, 255, 255, 0.85);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     border: 1px solid rgba(255, 255, 255, 0.5);
@@ -78,3 +122,4 @@ body.bg-pastel {
         pointer-events: none;
     }
 }
+

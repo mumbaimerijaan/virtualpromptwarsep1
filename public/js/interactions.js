@@ -146,7 +146,7 @@ window.interactionsLogic = {
                         <td class="px-6 py-4 text-[10px] font-bold text-gray-400 tabular-nums">${date}</td>
                         <td class="px-6 py-4 font-medium text-gray-700 truncate max-w-xs">${note.summary}</td>
                         <td class="px-6 py-4 text-right">
-                            <button class="text-[10px] bg-indigo-50 text-indigo-600 px-3 py-1 rounded-full font-black uppercase tracking-widest hover:bg-indigo-600 hover:text-white transition-all">View</button>
+                            <button class="text-[10px] btn-pill-cyan px-3 py-1 font-black uppercase tracking-widest transition-all">View</button>
                         </td>
                     </tr>
                 `);

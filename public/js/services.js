@@ -17,27 +17,32 @@
  * @returns {Promise<Response>}
  */
 async function robustFetch(url, options, retries = 3, backoff = 500) {
-    for (let i = 0; i <= retries; i++) {
-        try {
-            const response = await fetch(url, options);
-            
-            // Retry only on 5xx or network errors satisfies @[skills/resilient-data-patterns]
-            if (!response.ok && response.status >= 500 && i < retries) {
-                const delay = backoff * Math.pow(2, i) + Math.random() * 100;
-                console.warn(`[RETRY] Attempt ${i + 1} for ${url} failed with ${response.status}. Retrying in ${Math.round(delay)}ms...`);
-                await new Promise(r => setTimeout(r, delay));
-                continue;
+    if (window.utils && window.utils.showLoader) window.utils.showLoader();
+    try {
+        for (let i = 0; i <= retries; i++) {
+            try {
+                const response = await fetch(url, options);
+                
+                // Retry only on 5xx or network errors satisfies @[skills/resilient-data-patterns]
+                if (!response.ok && response.status >= 500 && i < retries) {
+                    const delay = backoff * Math.pow(2, i) + Math.random() * 100;
+                    console.warn(`[RETRY] Attempt ${i + 1} for ${url} failed with ${response.status}. Retrying in ${Math.round(delay)}ms...`);
+                    await new Promise(r => setTimeout(r, delay));
+                    continue;
+                }
+                return response;
+            } catch (err) {
+                if (i < retries) {
+                    const delay = backoff * Math.pow(2, i) + Math.random() * 100;
+                    console.warn(`[RETRY] Network error on attempt ${i + 1}. Retrying in ${Math.round(delay)}ms...`);
+                    await new Promise(r => setTimeout(r, delay));
+                    continue;
+                }
+                throw err;
             }
-            return response;
-        } catch (err) {
-            if (i < retries) {
-                const delay = backoff * Math.pow(2, i) + Math.random() * 100;
-                console.warn(`[RETRY] Network error on attempt ${i + 1}. Retrying in ${Math.round(delay)}ms...`);
-                await new Promise(r => setTimeout(r, delay));
-                continue;
-            }
-            throw err;
         }
+    } finally {
+        if (window.utils && window.utils.hideLoader) window.utils.hideLoader();
     }
 }
 
@@ -61,6 +66,12 @@ window.services = {
 
                 if (typeof firebase !== 'undefined' && !firebase.apps.length) {
                     firebase.initializeApp(firebaseConfig);
+                    
+                    // Enforce Global Resilience Mapping satisfies @[skills/resilient-data-patterns]
+                    // This must be set before any collection/document references are created.
+                    const db = firebase.firestore();
+                    db.settings({ experimentalAutoDetectLongPolling: true });
+                    
                     console.log('[ARCHITECT] Global Bootstrap Successful for:', firebaseConfig.projectId);
                 }
             } catch (err) {
