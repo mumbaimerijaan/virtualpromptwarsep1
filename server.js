@@ -30,6 +30,11 @@ const adminRoutes = require('./routes/admin');
 const configRoutes = require('./routes/config');
 const errorHandler = require('./middleware/errorHandler');
 
+const app = express();
+// Enforce strict port mapping from environment with fallback logic mapping @[skills/serverless-gcp-deployment]
+const initialPort = parseInt(process.env.PORT) || 3080;
+const publicPath = path.join(__dirname, 'public');
+
 // --- 2. SECURITY NONCE GENERATOR satisfies @[skills/zero-trust-cloud-security] ---
 app.use((req, res, next) => {
     res.locals.nonce = crypto.randomBytes(16).toString('base64');
