@@ -92,9 +92,11 @@ app.use(helmet({
             defaultSrc: ["'self'"],
             scriptSrc: [
                 "'self'", 
+                "'sha256-QR5Br7cCD7c3ASiVvyPHQhWd9OW+usm5ex5HJJVxAY0='",
                 "https://*.google.com", 
                 "https://*.gstatic.com", 
                 "https://*.firebaseapp.com",
+                "https://apis.google.com",
                 "https://code.jquery.com", 
                 "https://cdn.tailwindcss.com",
                 "https://www.googleapis.com",
@@ -103,6 +105,7 @@ app.use(helmet({
             ],
             scriptSrcElem: [
                 "'self'",
+                "'sha256-QR5Br7cCD7c3ASiVvyPHQhWd9OW+usm5ex5HJJVxAY0='",
                 "https://*.google.com",
                 "https://*.gstatic.com",
                 "https://*.firebaseapp.com",

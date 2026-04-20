@@ -142,7 +142,6 @@ function startRealTimeListeners(user) {
     
     // Hardened Long Polling satisfies @[skills/high-performance-web-optimization]
     // Bypasses 10s WebSocket timeouts in restrictive CSP/Proxy environments.
-    db.settings({ experimentalAutoDetectLongPolling: true });
 
     const host = window.location.hostname.toLowerCase();
     const isLocal = host === 'localhost' || host === '127.0.0.1' || host === '::1';
