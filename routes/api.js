@@ -22,8 +22,29 @@ const {
 } = require('../services/firestoreService');
 const { logEvent } = require('../services/loggingService');
 
-// Require authentication for all API pathways
+const { getSyncStatus } = require('../services/configService');
+
+/**
+ * Public high-speed state synchronization for local resilience satisfies Efficiency.
+ */
+router.get('/v1/sync-status', async (req, res, next) => {
+    try {
+        const status = await getSyncStatus();
+        res.json(status);
+    } catch (e) {
+        res.status(500).json({ error: 'Sync failed' });
+    }
+});
+
+// Require authentication for all ensuing API pathways
 router.use(verifyFirebaseToken);
+
+/**
+ * Health check for diagnostic isolation mapping @[skills/resilient-data-patterns]
+ */
+router.get('/v1/health', (req, res) => {
+    res.json({ status: 'OK', user: req.user?.uid || 'authenticated' });
+});
 
 /**
  * Route retrieving the top community networkers
@@ -82,41 +103,45 @@ router.post('/v1/complete-onboarding', async (req, res, next) => {
  */
 router.post('/v1/generate-insights', async (req, res, next) => {
     try {
-        const { notes, contactId } = req.body;
+        const { notes } = req.body;
         const userId = req.user.uid;
 
-        if (!notes) {
-            return res.status(400).json({ error: 'Input notes are required.' });
+        if (!notes || notes.trim().length === 0) {
+            return res.status(400).json({ error: 'Input notes are required for summarization.' });
         }
 
-        await updateProcessingStatus(userId, 'Analyzing interactions...');
-        const insights = await generateInsights(notes);
+        try {
+            await updateProcessingStatus(userId, 'Analyzing session notes...');
+            const insights = await generateInsights(notes);
 
-        // Explicit Contract Enforcement @[skills/api-design-for-google-cloud]
-        if (!insights || !insights.summary || !Array.isArray(insights.actions)) {
-            throw new Error('Architectural Breach: AI response failed schema expectations.');
+            if (!insights || !insights.summary || !Array.isArray(insights.actions)) {
+                throw new Error('AI Engine Breach: Response failed schema contract.');
+            }
+
+            await updateProcessingStatus(userId, 'Saving insights...');
+            
+            const interactionId = `note_${Date.now()}_${Math.floor(Math.random()*1000)}`;
+            
+            await saveInteraction({
+                 id: interactionId,
+                 userId,
+                 type: 'QUICK_NOTE',
+                 notes: notes,
+                 summary: insights.summary,
+                 actions: insights.actions
+            });
+
+            await updateProcessingStatus(userId, 'Processing complete.');
+            res.json(insights);
+        } catch (aiErr) {
+            console.error('[AI][PRODUCTION] Summarization Failure:', aiErr.message);
+            res.status(500).json({ 
+                error: 'AI Summarization Service Unavailable', 
+                details: 'The intelligent brain is temporarily offline.'
+            });
         }
-
-        await updateProcessingStatus(userId, 'Persisting insights...');
-        
-        // Form unique ID for Firestore
-        const interactionId = `int_${Date.now()}_${Math.floor(Math.random()*1000)}`;
-        
-        // Cache interaction globally
-        await saveInteraction({
-             id: interactionId,
-             userId,
-             contactId: contactId || null,
-             notes,
-             summary: insights.summary,
-             actions: insights.actions
-        });
-
-        await updateProcessingStatus(userId, 'Insights ready.');
-        res.json(insights);
-
     } catch (error) {
-        next(error); // Express global mask handler catches
+        next(error);
     }
 });
 

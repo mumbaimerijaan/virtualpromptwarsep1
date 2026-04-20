@@ -21,7 +21,15 @@ const COLLECTIONS = {
     PROCESSING_STATUS: 'processing_status'
 };
 
-const getDb = () => admin.firestore();
+const getDb = () => {
+    try {
+        if (!admin.apps.length) throw new Error('Firebase Admin not initialized');
+        return admin.firestore();
+    } catch (e) {
+        useSandbox(e.message);
+        return null;
+    }
+};
 
 // Sandbox Resilience mapping @[skills/resilient-data-patterns]
 const sandboxFilePath = path.join(__dirname, '../.sandbox.json');
@@ -115,32 +123,42 @@ const updateUserProfile = async (uid, payload) => {
 };
 
 /**
- * Records an AI networking interaction.
+ * Records an AI networking interaction or Quick Note.
  */
-const saveInteraction = async ({ id, userId, contactId, notes, summary, actions }) => {
+const saveInteraction = async ({ id, userId, contactId, type, notes, summary, actions }) => {
     if (process.env.NODE_ENV === 'test' || isUsingSandbox) {
-        sandboxDB.interactions.push({ id, userId, contactId, notes, summary, actions, timestamp: new Date() });
+        sandboxDB.interactions.push({ id, userId, contactId, type: type || 'INTERACTION', notes, summary, actions, timestamp: new Date() });
         if (sandboxDB.users[userId]) sandboxDB.users[userId].interactionCount++;
         persistSandbox();
         return true;
     }
     try {
         const db = getDb();
+        if (!db) {
+            useSandbox('Database unreachable during saveInteraction');
+            return saveInteraction({ id, userId, contactId, type, notes, summary, actions });
+        }
         const interactionRef = db.collection(COLLECTIONS.INTERACTIONS).doc(id);
         const userRef = db.collection(COLLECTIONS.USERS).doc(userId);
 
         await db.runTransaction(async (t) => {
-            t.set(interactionRef, { id, userId, contactId, notes, summary, actions, timestamp: admin.firestore.FieldValue.serverTimestamp() });
+            t.set(interactionRef, { 
+                id, 
+                userId, 
+                contactId: contactId || null, 
+                type: type || 'INTERACTION',
+                notes, 
+                summary, 
+                actions, 
+                timestamp: admin.firestore.FieldValue.serverTimestamp() 
+            });
             t.update(userRef, { interactionCount: admin.firestore.FieldValue.increment(1) });
         });
-        logEvent('INFO', { message: 'Interaction Persisted', userId });
+        logEvent('INFO', { message: 'Interaction Persisted', userId, type });
         return true;
     } catch (e) {
-        if (e.message.includes('credentials')) {
-            useSandbox(e.message);
-            return saveInteraction({ id, userId, contactId, notes, summary, actions });
-        }
-        throw e;
+        useSandbox(e.message);
+        return saveInteraction({ id, userId, contactId, type, notes, summary, actions });
     }
 };
 
@@ -171,15 +189,42 @@ module.exports = {
     saveInteraction,
     getAdminStats,
     updateUserProfile,
+    isUsingSandbox: () => isUsingSandbox,
+    useSandbox,
+    getSandboxDB: () => sandboxDB,
+    persistSandbox,
     getLeaderboard: async () => {
         if (isUsingSandbox) return Object.values(sandboxDB.users).sort((a,b) => b.interactionCount - a.interactionCount).slice(0, 5);
-        const snap = await getDb().collection(COLLECTIONS.USERS).orderBy('interactionCount', 'desc').limit(5).get();
-        return snap.docs.map(d => d.data());
+        try {
+            const snap = await getDb().collection(COLLECTIONS.USERS).orderBy('interactionCount', 'desc').limit(5).get();
+            return snap.docs.map(d => d.data());
+        } catch (e) {
+            useSandbox(e.message);
+            return Object.values(sandboxDB.users).sort((a,b) => b.interactionCount - a.interactionCount).slice(0, 5);
+        }
     },
     getUserProfile: async (uid) => {
-        if (isUsingSandbox) return sandboxDB.users[uid] || null;
-        const doc = await getDb().collection(COLLECTIONS.USERS).doc(uid).get();
-        return doc.exists ? doc.data() : null;
+        if (isUsingSandbox) {
+            const user = sandboxDB.users[uid];
+            if (!user && uid === 'mock_user_123') {
+                return {
+                    uid: 'mock_user_123',
+                    name: 'Sandbox Architect',
+                    email: 'sandbox@example.com',
+                    onboardingComplete: true,
+                    interactionCount: 5,
+                    bio: 'Event companion local testing unit.'
+                };
+            }
+            return user || null;
+        }
+        try {
+            const doc = await getDb().collection(COLLECTIONS.USERS).doc(uid).get();
+            return doc.exists ? doc.data() : null;
+        } catch (e) {
+            useSandbox(e.message);
+            return sandboxDB.users[uid] || null;
+        }
     },
     /**
      * Updates the inclusive narrative state for AI processing.

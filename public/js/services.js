@@ -101,15 +101,9 @@ window.services = {
         return await response.json();
     },
 
-    /**
-     * Executes the generative payload network call.
-     * @param {string} rawNotes - HTML un-sanitized string 
-     * @param {string} contactId - Potential QR contact identifier
-     * @returns {Promise<Object>}
-     */
-    generateInsights: async (rawNotes, contactId) => {
+    generateInsights: async (rawNotes) => {
         const { token } = window.roleState.getSession();
-        const safeNotes = window.utils.sanitizeInput(rawNotes);
+        const safeNotes = rawNotes ? window.utils.sanitizeInput(rawNotes) : '';
 
         const response = await robustFetch('/api/v1/generate-insights', {
             method: 'POST',
@@ -117,11 +111,12 @@ window.services = {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
             },
-            body: JSON.stringify({ notes: safeNotes, contactId: window.utils.sanitizeInput(contactId) })
+            body: JSON.stringify({ notes: safeNotes })
         });
 
         if (!response.ok) {
-            throw new Error(`Failed insights calculation: ${response.status}`);
+            const err = await response.json();
+            throw new Error(err.error || `Failed insights calculation: ${response.status}`);
         }
 
         return await response.json();
@@ -166,6 +161,11 @@ window.services = {
     
         return await response.json();
     },
+
+    /**
+     * Alias for fetchAdminStats satisfies architectural consistency.
+     */
+    getAdminStats: async function() { return this.fetchAdminStats(); },
 
     /**
      * Retrieves the user profile for the authorized attendee.

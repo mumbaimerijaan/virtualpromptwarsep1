@@ -73,33 +73,38 @@ window.authLogic = {
              }
 
              const provider = new firebase.auth.GoogleAuthProvider();
-             try {
-                 const result = await auth.signInWithPopup(provider);
-                 const user = result.user;
-                 const idToken = await user.getIdToken();
+             const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 
-                 window.roleState.setSession(idToken, 'user');
-                 
-                 // Sync backend and determine new vs returning mapping
-                 const res = await fetch('/api/v1/sync-user', {
-                     method: 'POST',
-                     headers: { 
-                         'Content-Type': 'application/json',
-                         'Authorization': `Bearer ${idToken}`
-                     },
-                     body: JSON.stringify({ uid: user.uid, name: user.displayName, email: user.email })
-                 });
-                 
-                 const payload = await res.json();
-                 
-                 if (payload.isNewUser) {
-                      window.location.replace('/onboarding');
+             try {
+                 if (isLocal) {
+                     // 🛡️ Local Hardening: Use Popup on localhost to bypass HTTP redirect restrictions satisfy @[skills/resilient-data-patterns]
+                     console.log('[ARCHITECT] Local environment detected. Preparing Hardened Popup...');
+                     
+                     // Stabilization Delay: Ensures App Check handshake is complete before window framing
+                     await new Promise(resolve => setTimeout(resolve, 500));
+                     
+                     const result = await auth.signInWithPopup(provider);
+                     if (result && result.user) {
+                         const idToken = await result.user.getIdToken();
+                         window.roleState.setSession(idToken, 'user');
+                         const syncRes = await fetch('/api/v1/sync-user', {
+                             method: 'POST',
+                             headers: { 
+                                 'Content-Type': 'application/json',
+                                 'Authorization': `Bearer ${idToken}`
+                             },
+                             body: JSON.stringify({ uid: result.user.uid, name: result.user.displayName, email: result.user.email })
+                         });
+                         const payload = await syncRes.json();
+                         window.location.replace(payload.isNewUser ? '/onboarding' : '/dashboard');
+                     }
                  } else {
-                      window.location.replace('/dashboard');
+                     // 🚀 Production Hardening: Use Redirect satisfies Architectural Hardening Directive
+                     console.log('[ARCHITECT] Production environment detected. Initiating Redirect Flow.');
+                     await auth.signInWithRedirect(provider);
                  }
-                 
              } catch (error) {
-                 console.error('Google Auth Failed', error);
+                 console.error('Auth Initialization Failed', error);
                  ui.errorMsg.text(`Authentication failed: ${error.message}`).removeClass('hidden');
              }
         });

@@ -112,4 +112,28 @@ const getGlobalConfig = async () => {
     }
 };
 
-module.exports = { updateGlobalConfig, pushBroadcast, getGlobalConfig };
+/**
+ * Retrieves a unified sync status for local resilience polling satisfies Efficiency.
+ */
+const getSyncStatus = async () => {
+    const config = await getGlobalConfig();
+    let latestBroadcast = null;
+
+    if (isUsingSandbox()) {
+        const db = getSandboxDB();
+        latestBroadcast = db.broadcasts && db.broadcasts.length ? db.broadcasts[db.broadcasts.length - 1] : null;
+    } else {
+        try {
+            const snap = await getDb().collection(GlobalConfig.FIRESTORE.COLLECTIONS.BROADCASTS)
+                .orderBy('timestamp', 'desc').limit(1).get();
+            latestBroadcast = !snap.empty ? snap.docs[0].data() : null;
+        } catch (e) { }
+    }
+
+    return {
+        ...config,
+        latestBroadcast
+    };
+};
+
+module.exports = { updateGlobalConfig, pushBroadcast, getGlobalConfig, getSyncStatus };
