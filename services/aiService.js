@@ -64,7 +64,9 @@ const generateInsights = async (notes, traceId = null) => {
         throw new Error('Input content is empty.');
     }
 
-    if (!model) {
+    const isLocal = !process.env.GOOGLE_CLOUD_PROJECT || process.env.NODE_ENV === 'development' || !project;
+
+    if (!model && !isLocal) {
         logEvent('CRITICAL', { message: 'Invoked AI without initialized model' }, traceId);
         throw new Error('Vertex AI (ADC) not initialized.');
     }

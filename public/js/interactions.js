@@ -101,6 +101,13 @@ window.interactionsLogic = {
         };
 
         const fetchSandboxHistory = async () => {
+             const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+             const { role } = window.roleState.getSession();
+             
+             // --- BOUNDARY PROTECTION mapping @[skills/modular-frontend-orchestration] ---
+             // Only fetch admin stats fallback if on localhost. Never in Production for Attendees.
+             if (!isLocal) return;
+
             try {
                 // Fetch direct from the local diagnostic endpoint
                 const stats = await window.services.getAdminStats();
