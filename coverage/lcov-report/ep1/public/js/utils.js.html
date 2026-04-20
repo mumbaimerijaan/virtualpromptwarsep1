@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">42.22% </span>
+                <span class="strong">34.54% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>19/45</span>
+                <span class='fraction'>19/55</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">55.26% </span>
+                <span class="strong">45.65% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>21/38</span>
+                <span class='fraction'>21/46</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">44.44% </span>
+                <span class="strong">40% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>4/9</span>
+                <span class='fraction'>4/10</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">40.54% </span>
+                <span class="strong">34.09% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>15/37</span>
+                <span class='fraction'>15/44</span>
             </div>
         
             
@@ -155,7 +155,25 @@
 <a name='L90'></a><a href='#L90'>90</a>
 <a name='L91'></a><a href='#L91'>91</a>
 <a name='L92'></a><a href='#L92'>92</a>
-<a name='L93'></a><a href='#L93'>93</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L93'></a><a href='#L93'>93</a>
+<a name='L94'></a><a href='#L94'>94</a>
+<a name='L95'></a><a href='#L95'>95</a>
+<a name='L96'></a><a href='#L96'>96</a>
+<a name='L97'></a><a href='#L97'>97</a>
+<a name='L98'></a><a href='#L98'>98</a>
+<a name='L99'></a><a href='#L99'>99</a>
+<a name='L100'></a><a href='#L100'>100</a>
+<a name='L101'></a><a href='#L101'>101</a>
+<a name='L102'></a><a href='#L102'>102</a>
+<a name='L103'></a><a href='#L103'>103</a>
+<a name='L104'></a><a href='#L104'>104</a>
+<a name='L105'></a><a href='#L105'>105</a>
+<a name='L106'></a><a href='#L106'>106</a>
+<a name='L107'></a><a href='#L107'>107</a>
+<a name='L108'></a><a href='#L108'>108</a>
+<a name='L109'></a><a href='#L109'>109</a>
+<a name='L110'></a><a href='#L110'>110</a>
+<a name='L111'></a><a href='#L111'>111</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -243,6 +261,24 @@
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -335,6 +371,24 @@ namespace.utils = {
         const data = await response.json();
         if (!response.ok) throw new Error(data.error || <span class="branch-1 cbranch-no" title="branch not covered" >'Request failed')</span>;
         return data;
+    },
+&nbsp;
+    /**
+     * Resolves dates from both Firebase SDK objects and POJOs mapping @[skills/resilient-data-patterns]
+     */
+    formatDate: <span class="fstat-no" title="function not covered" >(t</span>imestamp) =&gt; {
+<span class="cstat-no" title="statement not covered" >        if (!timestamp) <span class="cstat-no" title="statement not covered" >return 'Just now';</span></span>
+<span class="cstat-no" title="statement not covered" >        try {</span>
+            // Case 1: Firebase Timestamp instance
+<span class="cstat-no" title="statement not covered" >            if (typeof timestamp.toDate === 'function') <span class="cstat-no" title="statement not covered" >return timestamp.toDate().toLocaleString();</span></span>
+            // Case 2: Firestore POJO { _seconds, _nanoseconds }
+<span class="cstat-no" title="statement not covered" >            if (timestamp._seconds) <span class="cstat-no" title="statement not covered" >return new Date(timestamp._seconds * 1000).toLocaleString();</span></span>
+            // Case 3: Standard Native Date or ISO string
+            const d = <span class="cstat-no" title="statement not covered" >new Date(timestamp);</span>
+<span class="cstat-no" title="statement not covered" >            return isNaN(d.getTime()) ? 'N/A' : d.toLocaleString();</span>
+        } catch (e) {
+<span class="cstat-no" title="statement not covered" >            return 'N/A';</span>
+        }
     }
 };
 &nbsp;
@@ -346,7 +400,7 @@ namespace.utils = {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-04-20T09:31:51.679Z
+                at 2026-04-20T09:47:58.726Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>
