@@ -7,29 +7,47 @@
     <!-- Localized jQuery 3.7.1 satisfies Resilience guards -->
     <script src="/js/lib/jquery.min.js" defer></script>
 
-    <link rel="stylesheet" href="/css/tailwind.css">
+    <!-- Typography & Design System satisfies @[skills/frontend-design] -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                    },
+                    borderRadius: {
+                        '4xl': '2.5rem',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Integration Scripts satisfying Architectural Integrity mapping @[skills/google-services-mastery] -->
     <link rel="stylesheet" href="/css/styles.css">
     <link rel="icon" href="data:,">
     <script src="/dist/js/utils.js" defer></script>
     <script src="/dist/js/role.js" defer></script>
     <script src="/dist/js/onboarding.js" defer></script>
 </head>
-<body class="min-h-screen font-sans bg-pastel p-4 flex justify-center items-start overflow-y-auto pt-10 pb-10">
-    <main class="glass-pwa w-full max-w-2xl p-6 sm:p-10 rounded-3xl shadow-xl">
-        <div class="text-center mb-8">
-            <h1 class="text-3xl font-bold text-gray-900 tracking-tight mb-2">Welcome to the Event!</h1>
-            <p class="text-gray-600 font-medium">Please complete your profile to enable personalized AI Networking Insights.</p>
+<body class="min-h-screen font-sans bg-pastel p-6 sm:p-12 flex justify-center items-start overflow-y-auto">
+    <main class="glass-pwa w-full max-w-2xl p-10 sm:p-14 rounded-4xl shadow-2xl transition-all duration-700">
+        <div class="text-center mb-10">
+            <h1 class="text-4xl font-extrabold text-blue-900/80 tracking-tight leading-tight mb-3">Welcome to the <br>Event!</h1>
+            <p class="text-lg text-slate-500 font-medium">Please complete your profile to enable personalized AI Networking Insights.</p>
         </div>
 
         <form id="onboarding-form" class="space-y-8">
             <!-- Basic Info -->
-            <section class="space-y-4">
-                <h3 class="text-xs font-black uppercase text-gray-400 tracking-widest border-b border-white/20 pb-2">1. Basic Info</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div><label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 px-1">Company / Organization</label>
-                    <input type="text" id="ob-company" required class="w-full bg-white/40 border border-white/60 rounded-xl px-4 py-3 focus:ring-4 focus:ring-indigo-100 focus:outline-none text-sm font-medium transition-all" placeholder="e.g. Acme Corp"></div>
-                    <div><label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 px-1">Role / Job Title</label>
-                    <input type="text" id="ob-role" required class="w-full bg-white/40 border border-white/60 rounded-xl px-4 py-3 focus:ring-4 focus:ring-indigo-100 focus:outline-none text-sm font-medium transition-all" placeholder="e.g. Product Manager"></div>
+            <section class="space-y-6">
+                <h3 class="text-xs font-black uppercase text-slate-400 tracking-[0.2em] border-b border-white/40 pb-3">1. Basic Info</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div><label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1">Company / Organization</label>
+                    <input type="text" id="ob-company" required class="w-full bg-white/40 border border-white/60 rounded-2xl px-5 py-4 focus:ring-4 focus:ring-cyan-100 focus:outline-none text-sm font-medium transition-all" placeholder="e.g. Acme Corp"></div>
+                    <div><label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1">Role / Job Title</label>
+                    <input type="text" id="ob-role" required class="w-full bg-white/40 border border-white/60 rounded-2xl px-5 py-4 focus:ring-4 focus:ring-cyan-100 focus:outline-none text-sm font-medium transition-all" placeholder="e.g. Product Manager"></div>
                 </div>
             </section>
 

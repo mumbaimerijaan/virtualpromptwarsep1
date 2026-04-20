@@ -14,13 +14,26 @@
     <!-- reCAPTCHA v3 satisfies @[skills/google-services-mastery] -->
     <script src="https://www.google.com/recaptcha/api.js?render=6LcRCr8sAAAAAExM8qP6dXSl5m7vFKOu9JprEgP"></script>
     
-    <!-- Local high-performance assets satisfies @[skills/high-performance-web-optimization] -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+    <!-- Typography & Design System satisfies @[skills/frontend-design] -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                    },
+                    borderRadius: {
+                        '4xl': '2.5rem',
+                    }
+                }
+            }
+        }
+    </script>
     
     <!-- Enforcing local Tailwind and jQuery satisfies @[skills/security-pillar] -->
     <script src="/js/lib/jquery.min.js" defer></script>
-    <link rel="stylesheet" href="/css/tailwind.css">
     <link rel="stylesheet" href="/css/styles.css">
             
     <!-- Firebase Compat Modules mapping @[skills/google-services-mastery] -->
@@ -46,8 +59,18 @@
 
     <div id="toast-container" class="fixed top-6 right-6 z-[200] space-y-3 pointer-events-none" aria-live="polite"></div>
 
-    <main id="main-content" class="glass-pwa w-full max-w-md p-8 rounded-3xl shadow-2xl text-center space-y-6">
-        <h1 class="text-3xl font-bold text-gray-900 tracking-tight">Smart Event Concierge</h1>
+    <div id="main-content" class="min-h-screen flex items-center justify-center p-6 sm:p-12">
+        <main class="w-full max-w-lg glass-pwa p-10 sm:p-14 text-center transition-all duration-700">
+            <!-- Hero Interaction Space -->
+            <div id="login-container" class="space-y-12">
+                <div class="space-y-4">
+                    <h1 class="text-5xl sm:text-6xl font-extrabold text-blue-900/80 tracking-tight leading-tight">
+                        Smart Event <br>Concierge
+                    </h1>
+                    <p class="text-lg text-slate-500 font-medium">
+                        Your intelligent companion for a <br>seamless event experience.
+                    </p>
+                </div>
         
         <div class="space-y-4">
             <button id="user-login-btn" class="w-full btn-pill-cyan py-4 px-4 flex items-center justify-center gap-3" aria-label="Login with Google">

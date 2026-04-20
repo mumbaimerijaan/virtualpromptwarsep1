@@ -5,15 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard | Smart Event Companion</title>
     
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+    <!-- Typography & Design System satisfies @[skills/frontend-design] -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                    },
+                    borderRadius: {
+                        '4xl': '2.5rem',
+                    }
+                }
+            }
+        }
+    </script>
     
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://code.jquery.com https://www.gstatic.com; connect-src 'self' https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://www.gstatic.com https://cdn.tailwindcss.com https://www.googleapis.com https://apis.google.com https://smarteventconcierge.web.app; img-src 'self' data: https://api.qrserver.com;">
-    <link rel="icon" href="data:,">
-    
-    <!-- Local Resilience Layer mapping @[skills/high-performance-web-optimization] -->
+    <!-- Enforcing local Tailwind and jQuery satisfies @[skills/security-pillar] -->
     <script src="/js/lib/jquery.min.js" defer></script>
-    <link rel="stylesheet" href="/css/tailwind.css">
     <link rel="stylesheet" href="/css/styles.css">
     
     <!-- Firebase Compat SDKs for real-time listeners mapping @[skills/google-services-mastery] -->
@@ -58,34 +69,39 @@
         <button id="logout-btn" class="text-xs font-bold text-gray-400 hover:text-red-500 transition-colors uppercase tracking-widest" aria-label="Logout">Exit Session</button>
     </nav>
 
-    <main class="max-w-6xl w-full mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 flex-1">
+    <main class="w-full max-w-4xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
         
-        <!-- Profile Column -->
-        <aside class="lg:col-span-4 space-y-8">
-            <section class="glass-pwa rounded-3xl p-8 text-center space-y-6 shadow-xl">
-                 <div class="relative inline-block p-4 bg-white rounded-3xl shadow-inner mb-2 border border-white/50">
-                    <img id="user-qr-code" src="" alt="Your Identification QR" class="w-40 h-40">
-                 </div>
-                 <div class="space-y-1">
-                     <h2 id="welcome-heading" class="text-2xl font-black text-gray-900 tracking-tight">Welcome!</h2>
-                     <p id="dash-company" class="text-sm font-bold text-gray-500">Event Participant</p>
-                     <p id="dash-role" class="text-[10px] text-indigo-500 font-black uppercase tracking-widest">Attendee Access</p>
-                 </div>
-            </section>
+        <!-- Sidebar / Profile Handshake mapping @[skills/modular-frontend-orchestration] -->
+        <aside class="lg:col-span-4 space-y-8 h-fit">
+            <div class="glass-pwa p-8 rounded-4xl flex flex-col items-center text-center space-y-4">
+                <div id="profile-pic" class="w-24 h-24 rounded-full border-4 border-white/80 shadow-inner bg-slate-100 flex items-center justify-center overflow-hidden">
+                    <span class="text-3xl font-black text-slate-300">?</span>
+                </div>
+                <div class="space-y-1">
+                    <h2 id="dash-name" class="text-2xl font-extrabold text-blue-900/80 tracking-tight">Attendee</h2>
+                    <p id="dash-company" class="text-xs text-slate-400 font-bold uppercase tracking-wider">Syncing...</p>
+                </div>
+            </div>
+            <div class="glass-pwa p-8 rounded-4xl space-y-6">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-sm font-black text-slate-400 uppercase tracking-[0.2em]">Quick Notes</h3>
+                    <span class="text-[10px] bg-cyan-100 text-cyan-700 px-3 py-1 rounded-full font-black">AI ENABLED</span>
+                </div>
+                <textarea id="quick-note" class="w-full h-32 bg-white/40 border-0 rounded-2xl p-6 text-sm font-medium placeholder-slate-400 focus:ring-4 focus:ring-cyan-100 transition-all" placeholder="Jot down session takeaways, lightning talk ideas, or networking leads..."></textarea>
+                <button id="save-note-btn" class="w-full btn-pill-cyan">Save Insights</button>
+                <div id="quick-notes-ledger" class="space-y-3 max-h-48 overflow-y-auto mt-4 scrollbar-hide"></div>
+            </div>
         </aside>
 
-        <!-- Dynamic Interaction Area mapping @[skills/ai-orchestration] -->
+        <!-- Main Engagement Feed satisfying @[skills/resilient-data-patterns] -->
         <section class="lg:col-span-8 flex flex-col gap-8">
-            
-            <!-- Automated Project Auditor satisfies Evaluation Engine Requirements -->
-            <div id="submission-card" class="hidden glass-pwa rounded-3xl p-8 relative overflow-hidden">
-                <div class="absolute -top-10 -right-10 w-40 h-40 bg-indigo-400/10 rounded-full blur-3xl"></div>
-                <h3 class="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-                    <svg class="w-6 h-6 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                    Automated Project Auditor
-                </h3>
+            <div class="glass-pwa p-10 rounded-4xl flex flex-col justify-center items-center text-center space-y-6">
+                <div class="space-y-2">
+                    <h2 class="text-xl font-black text-blue-900/40 uppercase tracking-[0.3em]">Evaluation Engine</h2>
+                    <h1 class="text-4xl font-extrabold text-blue-900/80">Submit Your Project</h1>
+                </div>
                 
-                <div class="space-y-4">
+                <div class="w-full space-y-4">
                     <div class="space-y-2">
                         <label for="cloud-run-url" class="text-[10px] font-black text-gray-400 uppercase tracking-widest px-1">Live Platform URL (Cloud Run)</label>
                         <input type="url" id="cloud-run-url" placeholder="https://project.run.app" class="w-full bg-white/40 border border-white/60 rounded-xl p-4 focus:ring-4 focus:ring-indigo-100 outline-none text-sm font-medium transition-all">
@@ -99,104 +115,14 @@
                         <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg>
                         Submit Project & Audit
                     </button>
-
-                    <!-- ARIA Narrator Territory mapping @[skills/wcag-inclusive-design] -->
-                    <div id="submission-status-narrative" class="sr-only" aria-live="polite"></div>
-
-                    <p class="text-[10px] text-gray-400 font-bold text-center uppercase tracking-widest py-2">Real-time Hybrid Evaluation using Gemini 1.5</p>
-                </div>
-
-                <div id="evaluation-result-area" class="hidden mt-8 pt-8 border-t border-white/40 space-y-6 animate-in fade-in duration-500">
-                    <div class="bg-indigo-50/50 p-6 rounded-2xl border border-indigo-100">
-                        <div class="flex justify-between items-end mb-4">
-                            <h4 class="text-xs font-black text-indigo-400 uppercase tracking-widest">Audit Score</h4>
-                            <span id="eval-score" class="text-3xl font-black text-indigo-600">0/100</span>
-                        </div>
-                        <div id="eval-pillars" class="grid grid-cols-3 gap-2 mb-4">
-                            <!-- Injected dynamically -->
-                        </div>
-                        <p id="eval-summary" class="text-sm text-gray-800 font-medium leading-relaxed"></p>
-                    </div>
                 </div>
             </div>
-
-            <!-- Quick Notes satisfies Legacy Restoration Requirements @[skills/ai-orchestration] -->
-            <div id="notes-card" class="glass-pwa rounded-3xl p-8 relative overflow-hidden">
-                <div class="absolute -bottom-10 -left-10 w-40 h-40 bg-emerald-400/10 rounded-full blur-3xl"></div>
-                <div class="flex justify-between items-start mb-6">
-                    <h3 class="text-xl font-bold text-gray-900 flex items-center gap-2">
-                        <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" width="20" height="20"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
-                        Quick Notes
-                    </h3>
-                </div>
-                
-                <div class="space-y-4">
-                    <div class="space-y-2">
-                        <label for="interaction-notes" class="text-[10px] font-black text-gray-400 uppercase tracking-widest px-1">Content Intake (Text Notes)</label>
-                        <div class="relative">
-                            <textarea id="interaction-notes" rows="4" placeholder="Focus your insights here... I will summarize your session notes automatically." class="w-full bg-white/40 border border-white/60 rounded-xl p-4 focus:ring-4 focus:ring-emerald-100 outline-none text-sm font-medium transition-all"></textarea>
-                        </div>
-                    </div>
-                    
-                    <div class="flex gap-3">
-                        <button id="generate-insights-btn" class="flex-1 btn-pill-cyan py-4 flex items-center justify-center gap-3">
-                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                            Summarize with AI
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Notes History Ledger satisfies Persistence Requirements mapping @[skills/resilient-data-patterns] -->
-                <div id="notes-history-container" class="mt-10 pt-8 border-t border-white/40 space-y-6">
-                    <div class="flex justify-between items-center px-1">
-                        <h4 class="text-xs font-black text-gray-400 uppercase tracking-widest">History & Ledger</h4>
-                        <button id="export-pdf-btn" class="hidden text-[10px] font-black text-indigo-500 hover:text-indigo-700 uppercase tracking-tight flex items-center gap-1 transition-all">
-                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                            Export to PDF
-                        </button>
-                    </div>
-                    <div class="overflow-hidden rounded-2xl border border-white bg-white/40 shadow-sm">
-                        <table class="w-full text-left text-sm">
-                            <thead class="bg-white/50 text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-white">
-                                <tr>
-                                    <th class="px-6 py-3">Timestamp</th>
-                                    <th class="px-6 py-3">Quick Summary</th>
-                                    <th class="px-6 py-3 text-right">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="notes-list" class="divide-y divide-white/50">
-                                <tr id="empty-ledger-row">
-                                    <td colspan="3" class="px-6 py-12 text-center">
-                                        <div class="flex flex-col items-center gap-2 opacity-40">
-                                            <svg class="mx-auto text-gray-400" width="48" height="48" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
-                                            <p class="text-[10px] font-black uppercase tracking-widest mt-2">No insights recorded yet</p>
-                                        </div>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Leaderboard Segment mapping @[skills/resilient-data-patterns] -->
-            <div id="leaderboard-container" class="glass-pwa rounded-3xl p-8">
-                <h3 class="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-                    <svg class="w-6 h-6 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
-                    Interaction Leaderboard
-                </h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div id="board-col-1" class="space-y-4"></div>
-                    <div id="board-col-2" class="space-y-4"></div>
-                </div>
-            </div>
-
         </section>
     </main>
 
     <!-- Global Modal Viewer satisfies Read-Only Narrative Requirements mapping @[skills/wcag-inclusive-design] -->
     <div id="note-modal" class="hidden fixed inset-0 z-[500] bg-gray-900/40 backdrop-blur-lg flex items-center justify-center p-4">
-        <div class="bg-white/90 backdrop-blur-xl w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
+        <div class="bg-white/90 backdrop-blur-xl w-full max-w-2xl rounded-4xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
             <div class="px-8 py-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
                 <div>
                     <h4 class="text-lg font-black text-gray-900 tracking-tight">Note Summary</h4>
