@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">42.85% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>2/2</span>
+                <span class='fraction'>3/7</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">50% </span>
+                <span class="strong">45.45% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>9/18</span>
+                <span class='fraction'>10/22</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/0</span>
+                <span class='fraction'>0/1</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">42.85% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>2/2</span>
+                <span class='fraction'>3/7</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line high'></div>
+    <div class='status-line low'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -121,7 +121,18 @@
 <a name='L56'></a><a href='#L56'>56</a>
 <a name='L57'></a><a href='#L57'>57</a>
 <a name='L58'></a><a href='#L58'>58</a>
-<a name='L59'></a><a href='#L59'>59</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L59'></a><a href='#L59'>59</a>
+<a name='L60'></a><a href='#L60'>60</a>
+<a name='L61'></a><a href='#L61'>61</a>
+<a name='L62'></a><a href='#L62'>62</a>
+<a name='L63'></a><a href='#L63'>63</a>
+<a name='L64'></a><a href='#L64'>64</a>
+<a name='L65'></a><a href='#L65'>65</a>
+<a name='L66'></a><a href='#L66'>66</a>
+<a name='L67'></a><a href='#L67'>67</a>
+<a name='L68'></a><a href='#L68'>68</a>
+<a name='L69'></a><a href='#L69'>69</a>
+<a name='L70'></a><a href='#L70'>70</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -173,6 +184,17 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -207,14 +229,14 @@ const GlobalConfig = {
         }
     },
     AUTH: {
-        ADMIN_JWT_SECRET: process.env.ADMIN_JWT_SECRET || <span class="branch-1 cbranch-no" title="branch not covered" >'fallback_secret',</span>
+        ADMIN_JWT_SECRET: process.env.ADMIN_JWT_SECRET || <span class="branch-1 cbranch-no" title="branch not covered" >'ROTATION_REQUIRED_FOR_ADMIN_LOGIN',</span>
         TOKEN_EXPIRY: '8h',
         ROLES: {
             ADMIN: 'admin',
             USER: 'user'
         },
         FIREBASE_CLIENT: {
-            apiKey: process.env.FIREBASE_API_KEY || <span class="branch-1 cbranch-no" title="branch not covered" >'AIzaSyAVEJM17A72o6Fit7VlxmFFUHnxyXaIUJE',</span>
+            apiKey: process.env.FIREBASE_API_KEY || <span class="branch-1 cbranch-no" title="branch not covered" >'ROTATION_REQUIRED',</span>
             authDomain: process.env.FIREBASE_AUTH_DOMAIN || <span class="branch-1 cbranch-no" title="branch not covered" >'smarteventconcierge.firebaseapp.com',</span>
             projectId: process.env.FIREBASE_PROJECT_ID || <span class="branch-1 cbranch-no" title="branch not covered" >'smarteventconcierge',</span>
             storageBucket: process.env.FIREBASE_STORAGE_BUCKET || <span class="branch-1 cbranch-no" title="branch not covered" >'smarteventconcierge.appspot.com',</span>
@@ -236,6 +258,17 @@ const GlobalConfig = {
     }
 };
 &nbsp;
+// Validation mapping @[skills/zero-trust-cloud-security]
+<span class="missing-if-branch" title="if path not taken" >I</span>if (GlobalConfig.PROJECT.ENV === 'production') {
+    const required = <span class="cstat-no" title="statement not covered" >['ADMIN_JWT_SECRET', 'FIREBASE_API_KEY'];</span>
+<span class="cstat-no" title="statement not covered" >    required.forEach(<span class="fstat-no" title="function not covered" >ke</span>y =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >        if (!process.env[key]) {</span>
+<span class="cstat-no" title="statement not covered" >            console.error(`[SECURITY][CRITICAL] Missing required environment variable: ${key}`);</span>
+            // In high-security contexts, we might throw here, but for now we log a critical error.
+        }
+    });
+}
+&nbsp;
 module.exports = GlobalConfig;
 &nbsp;</pre></td></tr></table></pre>
 
@@ -244,7 +277,7 @@ module.exports = GlobalConfig;
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-04-20T09:47:58.726Z
+                at 2026-04-20T14:01:55.760Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

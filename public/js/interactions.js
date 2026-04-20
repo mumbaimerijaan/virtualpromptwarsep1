@@ -17,8 +17,8 @@ window.interactionsLogic = {
     init: async () => {
         console.log('[QUICK-NOTES] Initializing System v10.1...');
         const ui = {
-            notesArea: $('#interaction-notes'),
-            insightsBtn: $('#generate-insights-btn'),
+            notesArea: $('#quick-note'),
+            insightsBtn: $('#save-note-btn'),
             attachBtn: $('#attach-file-btn'),
             fileInput: $('#file-input'),
             preview: $('#attachment-preview'),
