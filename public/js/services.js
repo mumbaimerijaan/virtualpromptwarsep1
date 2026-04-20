@@ -49,6 +49,7 @@ async function robustFetch(url, options, retries = 3, backoff = 500) {
 let bootstrapPromise = null;
 
 window.services = {
+    robustFetch,
 
     /**
      * Globally bootstraps the Firebase environment satisfies @[skills/google-services-mastery].

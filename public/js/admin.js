@@ -40,7 +40,14 @@ window.adminLogic = {
         window.adminLogic.lastNotifiedMinute = -1;
 
         try {
+            // 0. Ensure Global Handshake mapping @[skills/google-services-mastery]
+            if (window.services && window.services.bootstrap) {
+                await window.services.bootstrap();
+            }
+
             const db = firebase.firestore();
+            db.settings({ experimentalForceLongPolling: true });
+            
             const host = window.location.hostname.toLowerCase();
             const isLocal = host === 'localhost' || host === '127.0.0.1' || host === '::1';
 
