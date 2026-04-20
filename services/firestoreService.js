@@ -227,6 +227,32 @@ module.exports = {
         }
     },
     /**
+     * Retrieves the sorted activity ledger for a specific attendee.
+     * satisfies @[skills/resilient-data-patterns]
+     */
+    getUserActivity: async (uid) => {
+        if (process.env.NODE_ENV === 'test' || isUsingSandbox) {
+            return sandboxDB.interactions
+                .filter(i => i.userId === uid)
+                .sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
+        }
+        try {
+            const db = getDb();
+            const snap = await db.collection(COLLECTIONS.INTERACTIONS)
+                .where('userId', '==', uid)
+                .orderBy('timestamp', 'desc')
+                .limit(20)
+                .get();
+            return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        } catch (e) {
+            // Failsafe fallback to local sandbox if Cloud is unreachable
+            useSandbox(e.message);
+            return sandboxDB.interactions
+                .filter(i => i.userId === uid)
+                .sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
+        }
+    },
+    /**
      * Updates the inclusive narrative state for AI processing.
      * satisfies @[skills/accessibility]
      */

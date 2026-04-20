@@ -207,5 +207,22 @@ window.services = {
         }
 
         return await response.json();
+    },
+
+    fetchUserActivity: async () => {
+        const token = await window.services.getAuthToken();
+        
+        const response = await robustFetch('/api/v1/activity', {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(`Failed to load activity ledger: ${response.status}`);
+        }
+
+        return await response.json();
     }
 };

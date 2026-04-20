@@ -63,8 +63,8 @@ window.interactionsLogic = {
                 await window.services.generateInsights(notes);
                 window.utils.showToast('Quick Note Saved & Processed', 'success');
                 ui.notesArea.val('');
-                // Force immediate sync for sandbox visibility mapping @[skills/resilient-data-patterns]
-                await fetchSandboxHistory();
+                // Force immediate sync using the new User Activity endpoint
+                await syncHistoryLedger();
             } catch (err) {
                 window.utils.showToast(err.message || 'AI Processor Error', 'error');
             } finally {
@@ -91,31 +91,31 @@ window.interactionsLogic = {
                         notesHistory = cloudNotes.sort((a, b) => (b.timestamp?.toDate() || 0) - (a.timestamp?.toDate() || 0));
                         renderHistory();
                     } else if (window.location.hostname === 'localhost') {
-                         // FALLBACK: Fetch from local sandbox if cloud is empty mapping @[skills/resilient-data-patterns]
-                         fetchSandboxHistory();
+                         // FALLBACK: Fetch from local activity ledger
+                         syncHistoryLedger();
                     }
                 }, (error) => {
-                    console.warn('[QUICK-NOTES] Cloud Listener Restricted. Using Sandbox Fallback.');
-                    fetchSandboxHistory();
+                    console.warn('[QUICK-NOTES] Cloud Listener Restricted. Using History Handshake.');
+                    syncHistoryLedger();
                 });
         };
 
-        const fetchSandboxHistory = async () => {
-             const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-             const { role } = window.roleState.getSession();
-             
-             // --- BOUNDARY PROTECTION mapping @[skills/modular-frontend-orchestration] ---
-             // Only fetch admin stats fallback if on localhost. Never in Production for Attendees.
-             if (!isLocal) return;
-
+        /**
+         * Orchestrates a unified sync between Cloud listeners and a manual Refresh Handshake.
+         * satisfies @[skills/resilient-data-patterns]
+         */
+        const syncHistoryLedger = async () => {
             try {
-                // Fetch direct from the local diagnostic endpoint
-                const stats = await window.services.getAdminStats();
-                if (stats && stats.recentActivity) {
-                    notesHistory = stats.recentActivity
-                        .filter(note => !note.type || note.type === 'QUICK_NOTE')
-                        .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-                    console.log(`[QUICK-NOTES] Sandbox Ledger Hydrated: ${notesHistory.length} entries.`);
+                const data = await window.services.fetchUserActivity();
+                if (data && data.history) {
+                    notesHistory = data.history
+                        .filter(note => !note.type || note.type === 'QUICK_NOTE' || note.type === 'PROJECT_SUBMISSION')
+                        .sort((a,b) => {
+                             const dateA = a.timestamp?._seconds || new Date(a.timestamp).getTime() || 0;
+                             const dateB = b.timestamp?._seconds || new Date(b.timestamp).getTime() || 0;
+                             return dateB - dateA;
+                        });
+                    console.log(`[QUICK-NOTES] Ledger Synchronized: ${notesHistory.length} entries.`);
                     renderHistory();
                 }
             } catch (e) {

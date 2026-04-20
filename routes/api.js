@@ -17,8 +17,10 @@ const {
     syncUser, 
     updateUserProfile, 
     getUserProfile, 
+    getUserActivity,
     getLeaderboard,
-    updateProcessingStatus 
+    updateProcessingStatus,
+    isUsingSandbox
 } = require('../services/firestoreService');
 const { logEvent } = require('../services/loggingService');
 
@@ -112,6 +114,18 @@ router.post('/v1/complete-onboarding', async (req, res, next) => {
 });
 
 /**
+ * Route retrieving the current attendee's personal interaction ledger.
+ */
+router.get('/v1/activity', async (req, res, next) => {
+    try {
+        const history = await getUserActivity(req.user.uid);
+        res.json({ success: true, history });
+    } catch (error) {
+        next(error);
+    }
+});
+
+/**
  * Analyzes the notes and caches into Firestore interactions schema. 
  */
 router.post('/v1/generate-insights', async (req, res, next) => {
@@ -145,7 +159,13 @@ router.post('/v1/generate-insights', async (req, res, next) => {
             });
 
             await updateProcessingStatus(userId, 'Processing complete.');
-            res.json(insights);
+            res.json({
+                ...insights,
+                persistence: {
+                    mode: isUsingSandbox() ? 'sandbox' : 'cloud',
+                    id: interactionId
+                }
+            });
         } catch (aiErr) {
             console.error('[AI][PRODUCTION] Summarization Failure:', aiErr.message);
             res.status(500).json({ 
